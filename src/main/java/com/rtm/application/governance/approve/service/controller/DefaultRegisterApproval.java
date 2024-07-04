@@ -2,23 +2,27 @@ package com.rtm.application.governance.approve.service.controller;
 
 import com.rtm.application.governance.approve.Approval;
 import com.rtm.application.governance.approve.RegisterAuthorize;
-import com.rtm.application.governance.register.Application;
 import com.rtm.application.governance.register.ApplicationInfo;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class DefaultRegisterApproval implements RegisterAuthorize {
+public class DefaultRegisterApproval implements RegisterAuthorize<ApplicationInfo> {
 
 
     @Override
-    public Approval authentication(List<ApplicationInfo> applications) {
+    public Boolean approve(Approval approval) {
         return null;
     }
 
     @Override
-    public boolean approve(Approval approval) {
-        return false;
+    public List<Approval> getUnApprovedInfo() {
+        return null;
+    }
+
+    @Override
+    public List<Approval> getApprovedInfo() {
+        return null;
     }
 
     @Override
@@ -33,6 +37,11 @@ public class DefaultRegisterApproval implements RegisterAuthorize {
 
     @Override
     public List<Approval> getApprovalInfoBy(List<String> applicationIds) {
+        return null;
+    }
+
+    @Override
+    public Approval apply(List<ApplicationInfo> applications) {
         return null;
     }
 }

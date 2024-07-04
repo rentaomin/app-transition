@@ -12,15 +12,15 @@ import java.util.Collections;
 /**
  *  注册单个应用事件
  */
-public class ApplicationRegisteredEvent extends AbstractApplicationEvent<Application> {
+public class ApplicationRegisteredEvent extends AbstractApplicationEvent<ApplicationInfo> {
 
 
-    public ApplicationRegisteredEvent(Object source, Application application) {
+    public ApplicationRegisteredEvent(Object source, ApplicationInfo application) {
         this(source,application,null);
     }
 
 
-    public <R> ApplicationRegisteredEvent(Object source, Application application, EventCallBack<AbstractApplicationEvent, R> callBack) {
+    public <R> ApplicationRegisteredEvent(Object source, ApplicationInfo application, EventCallBack<AbstractApplicationEvent, R> callBack) {
         super(source, Collections.singletonList(application), callBack);
     }
 

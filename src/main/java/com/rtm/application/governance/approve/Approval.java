@@ -1,6 +1,5 @@
 package com.rtm.application.governance.approve;
 
-import com.rtm.application.governance.register.Application;
 import com.rtm.application.governance.register.ApplicationInfo;
 import com.rtm.application.governance.register.ApplicationState;
 import java.util.List;

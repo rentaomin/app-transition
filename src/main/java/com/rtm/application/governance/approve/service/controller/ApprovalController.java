@@ -2,7 +2,6 @@ package com.rtm.application.governance.approve.service.controller;
 
 import com.rtm.application.governance.approve.Approval;
 import com.rtm.application.governance.approve.RegisterAuthorize;
-import com.rtm.application.governance.register.ApplicationInfo;
 import com.rtm.application.util.Response;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -33,8 +32,8 @@ public class ApprovalController {
      * @return
      */
     @GetMapping("/info")
-    public Response<List<ApplicationInfo>> approve() {
-        List<ApplicationInfo> unApprovedApplicationInfo = registerAuthorize.getUnApprovedApplicationInfo();
-        return Response.builder().success(unApprovedApplicationInfo);
+    public Response<List<Approval>> approve() {
+        List<Approval> unApprovedInfo = registerAuthorize.getUnApprovedInfo();
+        return Response.builder().success(unApprovedInfo);
     }
 }

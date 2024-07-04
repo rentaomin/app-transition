@@ -1,7 +1,6 @@
 package com.rtm.application.governance;
 
 import com.rtm.application.governance.approve.callback.DefaultAppCallBack;
-import com.rtm.application.util.Response;
 
 /**
  *  事件回调函数，若业务执行对应事件需要回调，则实现该接口，若未显示声明回调函数
