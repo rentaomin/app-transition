@@ -1,7 +1,7 @@
 package com.rtm.application.mybatisFlex.enums;
 
 /**
- *  数据源属性名称枚举
+ *  应用配置文件中 mybatis-flex：下配置的自定义数据源属性名称枚举
  */
 public enum DataSourcePropKeyEnum {
 
