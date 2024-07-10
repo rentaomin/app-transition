@@ -5,41 +5,69 @@ server:
     context-path: /
   tomcat:
     max-swallow-size: 209715200
+
+mybatis-flex:
+  configurationProperties:
+#    指定默认数据源，该名称需要与数据源下配置的数据源名称一致
+    defaultDb: gbase
+    schema: mng
+  datasource:
+    mysql:
+      username: root
+      password: 123456
+      driverClassName: com.mysql.jdbc.Driver
+      url: jdbc:mysql://192.168.149.93:3306/dtpweb?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
+      type: com.alibaba.druid.pool.DruidDataSource
+    gbase:
+      url: jdbc:gbasedbt-sqli://192.168.149.99:9088/mng:GBASEDBTSERVER=dtpMng;SQLMODE=GBase;DB_LOCALE=zh_CN.57372;
+      username: gbasedbt
+      password: Ws-123456,.
+      driver-class-name: com.gbasedbt.jdbc.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
 spring:
   datasource:
-    driverClassName: dm.jdbc.driver.DmDriver
-    url: jdbc:dm://192.168.149.80:5236?schema="file-exchange"&clobAsString=1&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8
-    username: WONDERSOFT
-    password: ws-123456
-#    username: root
+#    driverClassName: dm.jdbc.driver.DmDriver
+#    url: jdbc:dm://192.168.149.80:5236?schema="file-exchange"&clobAsString=1&zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8
+#    username: WONDERSOFT
 #    password: ws-123456
-#    driverClassName: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://192.168.149.86:3306/file-exchange?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
+#    mysql:
+#      username: root
+#      password: 123456
+#      driverClassName: com.mysql.jdbc.Driver
+#      url: jdbc:mysql://192.168.149.93:3306/dtpweb?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
+#      type: com.alibaba.druid.pool.DruidDataSource
+
+    # gbase
+#    url: jdbc:gbasedbt-sqli://192.168.149.99:9088/mng:GBASEDBTSERVER=dtpMng;SQLMODE=GBase;DB_LOCALE=zh_CN.57372;
+#    username: gbasedbt
+#    password: Ws-123456,.
+#    driver-class-name: com.gbasedbt.jdbc.Driver
 #    type: com.alibaba.druid.pool.DruidDataSource
-    initialSize: 5
-    minIdle: 5
-    maxActive: 20
-    #获取连接等待超时时间
-    maxWait: 60000
-    #间隔多久进行一次检测，检测需要关闭的空闲连接
-    timeBetweenEvictionRunsMillis: 60000
-    #一个连接在池中最小生存的时间
-    minEvictableIdleTimeMillis: 300000
-    #指定获取连接时连接校验的sql查询语句
-    validationQuery: SELECT 'x'
-    #验证连接的有效性
-    testWhileIdle: true
-    #获取连接时候验证，会影响性能（不建议true）
-    testOnBorrow: true
-    #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
-    poolPreparedStatements: false
-    maxPoolPreparedStatementPerConnectionSize: 20
-    removeAbandoned: false
-    removeAbandonedTimeout: 1800
-    logAbandoned: true
-    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
-    filters: config,stat
-    keepAlive: true
+    druid:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      #获取连接等待超时时间
+      maxWait: 60000
+      #间隔多久进行一次检测，检测需要关闭的空闲连接
+      timeBetweenEvictionRunsMillis: 60000
+      #一个连接在池中最小生存的时间
+      minEvictableIdleTimeMillis: 300000
+      #指定获取连接时连接校验的sql查询语句
+      validationQuery: "SELECT 1 from dual"
+      #验证连接的有效性
+      testWhileIdle: true
+      #获取连接时候验证，会影响性能（不建议true）
+      testOnBorrow: true
+      #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+      poolPreparedStatements: false
+      maxPoolPreparedStatementPerConnectionSize: 20
+      removeAbandoned: false
+      removeAbandonedTimeout: 1800
+      logAbandoned: true
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: config,stat
+      keepAlive: true
 #    fileSchema: classpath:file-exchange-schema-dm.sql
 #    fileData: classpath:file-exchange-data-dm.sql
   sql:
@@ -60,39 +88,8 @@ spring:
     exclude:
 #      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
-  redis:
-    isJq: false
-    isCluster: false
-    password: unity2.0@wondersoft
-    host: 192.168.149.86
-    port: 6379
-    database: 0
-    commondb: 0
-    approvedb: 1
-    backup:
-      enable: true
-    timeout: 100000
-    jedis:
-      pool:
-        max-idle: 100
-        min-idle: 20
-        max-active: 200
-        max-wait: -1
   main:
     allow-circular-references: true
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-mybatis-plus:
-  mapper-locations: mapper/**/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
-
-minIO:
-  endpoint: http://192.168.149.96:9000
-  console: http://192.168.149.96:9001 #minio监控
-  accessKey: admin
-  secretKey: ENC(0n527BsVSlMZeCXUc8ap929lATTG/By5)
-  bucketName: processfilepath
