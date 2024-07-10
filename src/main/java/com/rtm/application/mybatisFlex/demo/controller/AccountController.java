@@ -1,8 +1,8 @@
-package com.rtm.application.mybatisFlex.controller;
+package com.rtm.application.mybatisFlex.demo.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.rtm.application.mybatisFlex.entity.AccountInfo;
-import com.rtm.application.mybatisFlex.service.AccountService;
+import com.rtm.application.mybatisFlex.demo.entity.AccountInfo;
+import com.rtm.application.mybatisFlex.demo.service.AccountService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

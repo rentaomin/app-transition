@@ -1,10 +1,10 @@
-package com.rtm.application.mybatisFlex.service;
+package com.rtm.application.mybatisFlex.demo.service;
 
 import com.mybatisflex.core.datasource.DataSourceKey;
 import com.mybatisflex.core.datasource.FlexDataSource;
 import com.rtm.application.mybatisFlex.configure.DataSourceProperties;
-import com.rtm.application.mybatisFlex.entity.AccountInfo;
-import com.rtm.application.mybatisFlex.mapper.AccountMapper;
+import com.rtm.application.mybatisFlex.demo.entity.AccountInfo;
+import com.rtm.application.mybatisFlex.demo.mapper.AccountMapper;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
@@ -23,7 +23,6 @@ public class AccountService {
     private DataSourceProperties dataSourceProperties;
 
     public AccountInfo select(String id) {
-        DataSourceKey.use("mysql");
         AccountInfo account = null;
         try {
             account = accountMapper.selectOneById(Long.parseLong(id));

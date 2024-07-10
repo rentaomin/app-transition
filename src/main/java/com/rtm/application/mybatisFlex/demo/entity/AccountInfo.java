@@ -1,13 +1,12 @@
-package com.rtm.application.mybatisFlex.entity;
+package com.rtm.application.mybatisFlex.demo.entity;
 
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Table("tb_account")
@@ -18,7 +17,6 @@ public class AccountInfo implements Serializable {
     private String userName;
     private Integer age;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date birthday;
+    private LocalDateTime birthday;
 
 }
