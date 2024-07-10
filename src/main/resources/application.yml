@@ -10,7 +10,6 @@ mybatis-flex:
   configurationProperties:
 #    指定默认数据源，该名称需要与数据源下配置的数据源名称一致
     defaultDb: gbase
-    schema: mng
   datasource:
     mysql:
       username: root
