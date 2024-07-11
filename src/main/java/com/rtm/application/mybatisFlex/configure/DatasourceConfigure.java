@@ -4,11 +4,13 @@ import com.mybatisflex.core.datasource.DataSourceBuilder;
 import com.mybatisflex.core.datasource.FlexDataSource;
 import com.mybatisflex.spring.boot.MybatisFlexProperties;
 import com.rtm.application.mybatisFlex.component.dbinit.DataSourceProperties;
+import com.rtm.application.mybatisFlex.component.dbinit.SqlExecuteErrorHandler;
 import com.rtm.application.mybatisFlex.component.dbinit.SqlInitManager;
 import com.rtm.application.mybatisFlex.enums.DataSourcePropKeyEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import javax.annotation.Resource;
@@ -27,6 +29,17 @@ public class DatasourceConfigure {
 
     @Resource
     private SqlInitManager sqlInitManager;
+
+
+    /**
+     *  应要启动初始化 SQL 错误处理器
+     * @return 返回默认的错误处理器，默认跳过错误
+     */
+    @ConditionalOnMissingBean
+    @Bean
+    public SqlExecuteErrorHandler sqlInitErrorHandler() {
+        return () -> Boolean.TRUE;
+    }
 
 
     /**

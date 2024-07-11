@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,6 +30,9 @@ public class SqlInitManager {
 
     @Resource
     private List<SqlInitStatement> sqlStatements;
+
+    @Resource
+    private SqlExecuteErrorHandler sqlExecuteErrorHandler;
 
     /**
      *  获取选择使用的数据库，第一个为默认数据源，默认读取配置文件
@@ -93,13 +95,11 @@ public class SqlInitManager {
 
         String url = extractBaseUrl(datasourceProperties.get("url"));
         DbType dbType = DbTypeUtil.parseDbType(url);
-        SqlInitStatement sqlInitStatement = null;
+        SqlInitStatement sqlInitStatement;
         try {
             sqlInitStatement = sqlInitStatementMap.get(dbType);
         } catch (Exception e) {
-            if (sqlInitStatement == null) {
-                log.error("数据库：{} 未找到对应初始化 SQL 语句!", dbType);
-            }
+            log.error("数据库：{} 未找到对应初始化 SQL 语句!", dbType);
             return;
         }
         if (!sqlInitStatement.enable()) {
@@ -117,7 +117,7 @@ public class SqlInitManager {
             log.error("数据库：{} 初始化 SQL 脚本为空，跳过执行初始化！", dbType);
             return;
         }
-        // gbase 驱动存在有时无法注册，进行主动加载
+        // GBase 驱动存在有时无法注册，进行主动加载
         if (DbType.GBASE_8S.equals(dbType)) {
             try {
                 Class.forName("com.gbasedbt.jdbc.Driver");
@@ -132,7 +132,14 @@ public class SqlInitManager {
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement()) {
             for (String sql : sqlStatements) {
-                statement.execute(sql);
+                try {
+                    statement.execute(sql);
+                } catch (SQLException e) {
+                    sqlExecuteErrorHandler.reportError(dbType, sql, e);
+                    if (!sqlExecuteErrorHandler.errorContinue()) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
             executeSuccess = true;
         } catch (SQLException e) {
