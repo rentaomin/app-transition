@@ -14,7 +14,7 @@ public class MysqlSqlInitStatement implements SqlInitStatement {
     @Override
     public String getSql() {
         log.error("mysql 正在执行初始化sql !");
-        return "create database fff";
+        return null;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MysqlSqlInitStatement implements SqlInitStatement {
 
     @Override
     public boolean enable() {
-        return true;
+        return false;
     }
 
     @Override
