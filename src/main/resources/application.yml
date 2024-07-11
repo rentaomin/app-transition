@@ -9,13 +9,13 @@ server:
 mybatis-flex:
   configurationProperties:
 #    指定默认数据源，该名称需要与数据源下配置的数据源名称一致
-    defaultDb: mysql
+    defaultDb: gbase,clickhouse
   datasource:
     mysql:
       username: root
       password: 123456
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.168.149.93:3306/ddd?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
+      url: jdbc:mysql://192.168.149.11:3306/ddd?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
       type: com.alibaba.druid.pool.DruidDataSource
       databaseInit: classpath:mysql-init-database.sql
       schemaInit: classpath:mysql-init-schema.sql
@@ -26,6 +26,15 @@ mybatis-flex:
       password: Ws-123456,.
       driver-class-name: com.gbasedbt.jdbc.Driver
       type: com.alibaba.druid.pool.DruidDataSource
+    clickhouse:
+      type: com.alibaba.druid.pool.DruidDataSource
+      url: jdbc:clickhouse://192.168.149.82:8123/logdata?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+      username: scma
+      password: ScmaFinanceWondersoft
+      driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+      databaseInit: classpath:clickhouse-init-database.sql
+      schemaInit: classpath:clickhouse-init-schema.sql
+      dataInit: classpath:clickhouse-init-data.sql
 spring:
   datasource:
 #    driverClassName: dm.jdbc.driver.DmDriver

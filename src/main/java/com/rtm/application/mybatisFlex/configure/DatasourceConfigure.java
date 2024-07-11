@@ -7,10 +7,14 @@ import com.rtm.application.mybatisFlex.component.dbinit.DataSourceProperties;
 import com.rtm.application.mybatisFlex.component.dbinit.SqlInitManager;
 import com.rtm.application.mybatisFlex.enums.DataSourcePropKeyEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,17 +47,37 @@ public class DatasourceConfigure {
      * @return 返回构建的多数据源信息
      */
     private FlexDataSource buildMultiDatasource(MybatisFlexProperties flexProperties) {
-        Map<String, Map<String, String>> datasource = flexProperties.getDatasource();
-        Object defaultSourceValue = flexProperties.getConfigurationProperties().get(DataSourcePropKeyEnum.DEFAULT_DB.getName());
-        String defaultDataSourceKey = defaultSourceValue != null ? defaultSourceValue.toString() : DataSourcePropKeyEnum.DEFAULT_DB.getName();
-        DataSource defaultDataSource = new DataSourceBuilder(datasource.get(defaultDataSourceKey)).build();
-        FlexDataSource  flexDataSource = new FlexDataSource(defaultDataSourceKey,defaultDataSource);
-        datasource.remove(defaultDataSourceKey);
+
+        Map<String, Map<String, String>> datasource = this.selectDataSource(flexProperties);
+
+        FlexDataSource flexDataSource = null;
         for (Map.Entry<String, Map<String, String>> entry : datasource.entrySet()) {
             DataSource dataSource = new DataSourceBuilder(entry.getValue()).build();
-            flexDataSource.addDataSource(entry.getKey(), dataSource, false);
+            if (flexDataSource == null) {
+                flexDataSource = new FlexDataSource(entry.getKey(), dataSource, false);
+            } else {
+                flexDataSource.addDataSource(entry.getKey(), dataSource, false);
+            }
         }
         return flexDataSource;
+    }
+
+
+    /**
+     *  选择应用使用的数据源
+     * @param flexProperties 多数据源配置属性
+     * @return 返回当前应用需要使用的数据库
+     */
+    private Map<String, Map<String, String>> selectDataSource(MybatisFlexProperties flexProperties) {
+        Map<String, Map<String, String>> datasource = flexProperties.getDatasource();
+        List<String> selectedDatabase = sqlInitManager.getSelectedDatabase();
+        if (CollectionUtils.isEmpty(selectedDatabase)) {
+            Object defaultSourceValue = flexProperties.getConfigurationProperties().get(DataSourcePropKeyEnum.DEFAULT_DB.getName());
+            String defaultDataSourceKey = defaultSourceValue != null ? defaultSourceValue.toString() : DataSourcePropKeyEnum.DEFAULT_DB.getName();
+            selectedDatabase = Arrays.asList(StringUtils.split(defaultDataSourceKey, ","));
+        }
+        datasource.keySet().retainAll(selectedDatabase);
+        return datasource;
     }
 
 

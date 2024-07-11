@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -29,6 +30,14 @@ public class SqlInitManager {
 
     @Resource
     private List<SqlInitStatement> sqlStatements;
+
+    /**
+     *  获取选择使用的数据库，第一个为默认数据源，默认读取配置文件
+     * @return 返回应用需要使用的数据库，默认第一个元素为默认数据源
+     */
+    public List<String> getSelectedDatabase() {
+        return Collections.emptyList();
+    }
 
 
     /**
