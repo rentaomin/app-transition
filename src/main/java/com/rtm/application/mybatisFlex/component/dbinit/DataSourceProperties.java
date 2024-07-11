@@ -1,8 +1,7 @@
-package com.rtm.application.mybatisFlex.configure;
+package com.rtm.application.mybatisFlex.component.dbinit;
 
 import com.mybatisflex.core.dialect.DbType;
 import com.rtm.application.mybatisFlex.enums.DataSourcePropKeyEnum;
-
 import java.util.Map;
 import java.util.Properties;
 
@@ -66,8 +65,19 @@ public class DataSourceProperties {
      * @return 返回对应的数据源基础属性信息
      */
     public Map<String, String> getDatasource(DbType dataSourceType) {
-        return this.datasource.get(dataSourceType.getName());
+        return getDatasource(dataSourceType.getName());
     }
+
+
+    /**
+     *  根据指定数据源类型获取配置文件 mybatis-flex: 配置的数据源信息
+     * @param dataSourceType 数据源类型, 详细可查看{@linkplain DbType}
+     * @return 返回对应的数据源基础属性信息
+     */
+    public Map<String, String> getDatasource(String dataSourceType) {
+        return this.datasource.get(dataSourceType);
+    }
+
 
     /**
      *  获取指定数据源中指定属性名称的值
@@ -76,6 +86,17 @@ public class DataSourceProperties {
      * @return 返回对应的属性值
      */
     public String getDatasourcePropValue(DbType dataSourceType, DataSourcePropKeyEnum dataSourcePropertyKey) {
+        return getDatasource(dataSourceType).get(dataSourcePropertyKey.getName());
+    }
+
+
+    /**
+     *  获取指定数据源中指定属性名称的值
+     * @param dataSourceType 数据源类型名称, 详细可查看{@linkplain DbType}
+     * @param dataSourcePropertyKey 属性名称，该值为{@linkplain DataSourcePropKeyEnum} 定义的属性名称
+     * @return 返回对应的属性值
+     */
+    public String getDatasourcePropValue(String dataSourceType, DataSourcePropKeyEnum dataSourcePropertyKey) {
         return getDatasource(dataSourceType).get(dataSourcePropertyKey.getName());
     }
 }

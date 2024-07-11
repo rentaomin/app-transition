@@ -1,9 +1,9 @@
-package com.rtm.application.mybatisFlex.configure;
+package com.rtm.application.mybatisFlex.component.dbinit;
 
 import com.mybatisflex.core.dialect.DbType;
 
 /**
- *  该接口主要为提供数据库执行初始化 sql
+ *  该接口主要为提供数据库执行初始化 sql, 若需要在应用启动时执行 sql ,则实现该接口
  */
 public interface SqlInitStatement {
 
@@ -29,28 +29,25 @@ public interface SqlInitStatement {
         return Boolean.FALSE;
     }
 
-
     /**
-     *  判断是否已经完成初始化
+     *  判断是否已经完成初始化 ,通过 {@linkplain #completeInit(boolean) 执行完成初始化标记}
      * @return 返回 true 则完成初始化，反之 false
      */
     boolean hasInit();
-
 
     /**
      *  初始化执行完成回调函数,该方法为回调函数，sql初始化执行完成后，调用该方法
      * @param result 初始化 sql 执行结果
      * @return 返回 true 则执行成功 反之 false 失败
      */
-    void completeCallback(boolean result);
+    void completeInit(boolean result);
 
     /**
-     *  获取数据库类型,默认为 {@linkplain DbType#MYSQL} 数据库类型
+     *  获取数据库类型,更多类型可查看 {@linkplain DbType}
      * @return 返回当前执行 sql 的数据库类型
      */
     default DbType getDbType() {
         return DbType.MYSQL;
     }
-
 
 }

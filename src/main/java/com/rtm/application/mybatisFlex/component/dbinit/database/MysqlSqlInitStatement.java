@@ -1,7 +1,7 @@
-package com.rtm.application.mybatisFlex.demo.service;
+package com.rtm.application.mybatisFlex.component.dbinit.database;
 
 import com.mybatisflex.core.dialect.DbType;
-import com.rtm.application.mybatisFlex.configure.SqlInitStatement;
+import com.rtm.application.mybatisFlex.component.dbinit.SqlInitStatement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class MysqlSqlInitStatement implements SqlInitStatement {
     }
 
     @Override
-    public void completeCallback(boolean result) {
+    public void completeInit(boolean result) {
         this.init = result;
     }
 

@@ -2,7 +2,7 @@ package com.rtm.application.mybatisFlex.demo.service;
 
 import com.mybatisflex.core.datasource.DataSourceKey;
 import com.mybatisflex.core.datasource.FlexDataSource;
-import com.rtm.application.mybatisFlex.configure.DataSourceProperties;
+import com.rtm.application.mybatisFlex.component.dbinit.DataSourceProperties;
 import com.rtm.application.mybatisFlex.demo.entity.AccountInfo;
 import com.rtm.application.mybatisFlex.demo.mapper.AccountMapper;
 import org.springframework.stereotype.Service;
