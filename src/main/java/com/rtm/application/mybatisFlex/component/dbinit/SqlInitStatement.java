@@ -1,6 +1,7 @@
 package com.rtm.application.mybatisFlex.component.dbinit;
 
 import com.mybatisflex.core.dialect.DbType;
+import java.util.List;
 
 /**
  *  该接口主要为提供数据库执行初始化 sql, 若需要在应用启动时执行 sql ,则实现该接口
@@ -8,10 +9,10 @@ import com.mybatisflex.core.dialect.DbType;
 public interface SqlInitStatement {
 
     /**
-     *  获取需要初始化执行的 sql 语句
-     * @return 返回需要初始化执行是 ssql
+     *  获取需要初始化执行的 sql 语句，分批次执行，建议 DDL 和 DML 语句分开执行，避免部分数据库不兼容问题
+     * @return 返回需要初始化执行是 sql
      */
-    String getSql();
+    List<String> getSql();
 
     /**
      *  是否需要启动执行初始化 sql, 默认 false 不执行初始化

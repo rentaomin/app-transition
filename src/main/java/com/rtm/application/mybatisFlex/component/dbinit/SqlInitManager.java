@@ -4,9 +4,10 @@ import com.mybatisflex.core.dialect.DbType;
 import com.mybatisflex.core.dialect.DbTypeUtil;
 import com.mybatisflex.spring.boot.MybatisFlexProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -111,8 +112,8 @@ public class SqlInitManager {
             return;
         }
 
-        String sql = sqlInitStatement.getSql();
-        if (StringUtils.isBlank(sql)) {
+        List<String> sqlStatements = sqlInitStatement.getSql();
+        if (CollectionUtils.isEmpty(sqlStatements)) {
             log.error("数据库：{} 初始化 SQL 脚本为空，跳过执行初始化！", dbType);
             return;
         }
@@ -128,10 +129,11 @@ public class SqlInitManager {
         String username = datasourceProperties.get("username");
         String password = datasourceProperties.get("password");
         boolean executeSuccess = false;
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            Statement statement = connection.createStatement();
-            statement.execute(sql);
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             Statement statement = connection.createStatement()) {
+            for (String sql : sqlStatements) {
+                statement.execute(sql);
+            }
             executeSuccess = true;
         } catch (SQLException e) {
             log.error("获取数据库： {} 连接或执行初始化 SQL 出错！", dbType, e);

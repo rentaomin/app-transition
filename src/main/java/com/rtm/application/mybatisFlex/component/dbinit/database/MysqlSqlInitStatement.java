@@ -5,6 +5,8 @@ import com.rtm.application.mybatisFlex.component.dbinit.SqlInitStatement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class MysqlSqlInitStatement implements SqlInitStatement {
@@ -12,7 +14,7 @@ public class MysqlSqlInitStatement implements SqlInitStatement {
     private boolean init = false;
 
     @Override
-    public String getSql() {
+    public List<String> getSql() {
         log.error("mysql 正在执行初始化sql !");
         return null;
     }

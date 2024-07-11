@@ -5,14 +5,16 @@ import com.rtm.application.mybatisFlex.component.dbinit.SqlInitStatement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class GbaseSqlInitStatement implements SqlInitStatement {
 
     @Override
-    public String getSql() {
+    public List<String> getSql() {
         log.error("gbase 正在执行初始化sql !");
-        return "create database fff";
+        return null;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class GbaseSqlInitStatement implements SqlInitStatement {
 
     @Override
     public boolean enable() {
-        return true;
+        return false;
     }
 
     @Override

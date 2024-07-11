@@ -134,9 +134,9 @@
 
     <!-- https://mvnrepository.com/artifact/com.clickhouse/clickhouse-jdbc -->
     <dependency>
-      <groupId>com.clickhouse</groupId>
+      <groupId>ru.yandex.clickhouse</groupId>
       <artifactId>clickhouse-jdbc</artifactId>
-      <version>0.6.0-patch5</version>
+      <version>0.1.53</version>
     </dependency>
 
   </dependencies>
