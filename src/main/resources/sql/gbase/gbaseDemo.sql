@@ -3,7 +3,7 @@ CREATE TABLE testdb:tb_account(
     id      INTEGER PRIMARY key ,
     user_name VARCHAR(100),
     age      INTEGER,
-    birthdate  datetime year to second
+    birthday  datetime year to second
 );
 
 INSERT INTO testdb:tb_account(id, user_name, age, birthdate) VALUES (1, '张三', 18, '2020-01-11 14:01:32'),(2, '李四', 19, '2021-03-21  12:02:01');

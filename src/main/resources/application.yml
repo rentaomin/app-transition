@@ -9,13 +9,13 @@ server:
 mybatis-flex:
   configurationProperties:
 #    指定默认数据源，该名称需要与数据源下配置的数据源名称一致,默认第一个为默认数据源，多个用英文逗号分割
-    defaultDb: clickhouse
+    defaultDb: gbase,mysql
   datasource:
     mysql:
       username: root
       password: 123456
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://192.168.149.11:3306/dtpweb?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
+      url: jdbc:mysql://192.168.149.93:3306/dtpweb?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2b8&allowMultiQueries=true
       type: com.alibaba.druid.pool.DruidDataSource
       databaseInit: classpath:mysql-init-database.sql
       schemaInit: classpath:mysql-init-schema.sql
@@ -101,6 +101,9 @@ spring:
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
   main:
     allow-circular-references: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

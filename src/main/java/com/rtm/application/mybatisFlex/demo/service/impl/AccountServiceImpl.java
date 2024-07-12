@@ -54,4 +54,9 @@ public class AccountServiceImpl implements AccountService {
         DataSourceKey.use("gbase");
         return accountMapper.selectAll();
     }
+
+    @Override
+    public int insert(Account account) {
+        return accountMapper.insert(account);
+    }
 }

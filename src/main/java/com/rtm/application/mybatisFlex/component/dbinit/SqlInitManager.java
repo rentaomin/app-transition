@@ -1,19 +1,23 @@
 package com.rtm.application.mybatisFlex.component.dbinit;
 
+import com.mybatisflex.core.datasource.DataSourceBuilder;
+import com.mybatisflex.core.datasource.FlexDataSource;
 import com.mybatisflex.core.dialect.DbType;
 import com.mybatisflex.core.dialect.DbTypeUtil;
 import com.mybatisflex.spring.boot.MybatisFlexProperties;
+import com.rtm.application.mybatisFlex.enums.DataSourcePropKeyEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.springframework.stereotype.Component;
-import javax.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import javax.sql.DataSource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +29,37 @@ import java.util.stream.Collectors;
  *  该组件主要提供应用服务启动时初始化 SQL 执行逻辑
  */
 @Slf4j
-@Component
 public class SqlInitManager {
 
-    @Resource
-    private List<SqlInitStatement> sqlStatements;
+    /**
+     *  多数据源配置属性
+     */
+    private MybatisFlexProperties mybatisFlexProperties;
 
-    @Resource
+    /**
+     *  应用多数据源
+     */
+    private FlexDataSource flexDataSource;
+
+    /**
+     *  初始化 sql 语句接口，负责提供需要执行初始化的 sql
+     */
+    private List<SqlInitStatement> sqlInitStatements;
+
+    /**
+     *  初始化执行 SQL 错误处理器
+     */
     private SqlExecuteErrorHandler sqlExecuteErrorHandler;
+
+
+    public SqlInitManager(MybatisFlexProperties mybatisFlexProperties, List<SqlInitStatement> sqlInitStatements,
+                          SqlExecuteErrorHandler sqlExecuteErrorHandler) {
+        this.mybatisFlexProperties = mybatisFlexProperties;
+        this.sqlInitStatements = sqlInitStatements;
+        this.sqlExecuteErrorHandler = sqlExecuteErrorHandler;
+        this.startInit();
+    }
+
 
     /**
      *  获取选择使用的数据库，第一个为默认数据源，默认读取配置文件
@@ -44,38 +71,43 @@ public class SqlInitManager {
 
 
     /**
-     *  执行初始化 sql
-     * @param flexProperties 数据源配置信息
+     *  初始化
      */
-    public void initSql(MybatisFlexProperties flexProperties) {
-
-        before(flexProperties);
-
-        initSql(flexProperties,this::doInitSql);
-
-        after();
+    public void startInit() {
+        this.initSql();
+        this.initMultiDatasource();
     }
+
+
+    /**
+     *  执行初始化 sql
+     */
+    public void initSql() {
+
+        beforeInitSql();
+
+        initSql(this::doInitSql);
+
+        afterInitSql();
+    }
+
 
     /**
      *  初始化 sql 执行前执行
-     * @param flexProperties 数据源配置信息
      */
-    protected void before(MybatisFlexProperties flexProperties) {
+    protected void beforeInitSql() {
         log.error("开始执行数据库初始化 SQL!");
     }
 
 
     /**
      *  执行初始化 sql 语句
-     * @param flexProperties 数据源配置信息
      * @param initConsumer 执行初始化函数
      */
-    private void initSql(MybatisFlexProperties flexProperties, Consumer<Map<String,String>> initConsumer) {
-        flexProperties.getDatasource()
+    private void initSql(Consumer<Map<String,String>> initConsumer) {
+        this.mybatisFlexProperties.getDatasource()
                 .values()
-                .forEach(db -> {
-                    initConsumer.accept(db);
-                });
+                .forEach(initConsumer);
     }
 
 
@@ -85,7 +117,13 @@ public class SqlInitManager {
      */
     private void doInitSql(Map<String,String> datasourceProperties) {
 
-        Map<DbType, SqlInitStatement> sqlInitStatementMap = sqlStatements.stream()
+        if (CollectionUtils.isEmpty(sqlInitStatements)) {
+            return;
+        }
+        if (MapUtils.isEmpty(datasourceProperties)) {
+            return;
+        }
+        Map<DbType, SqlInitStatement> sqlInitStatementMap = sqlInitStatements.stream()
                 .collect(Collectors.toMap(SqlInitStatement::getDbType, Function.identity()));
 
         if (MapUtils.isEmpty(sqlInitStatementMap)) {
@@ -95,10 +133,8 @@ public class SqlInitManager {
 
         String url = extractBaseUrl(datasourceProperties.get("url"));
         DbType dbType = DbTypeUtil.parseDbType(url);
-        SqlInitStatement sqlInitStatement;
-        try {
-            sqlInitStatement = sqlInitStatementMap.get(dbType);
-        } catch (Exception e) {
+        SqlInitStatement sqlInitStatement = sqlInitStatementMap.get(dbType);
+        if (sqlInitStatement == null) {
             log.error("数据库：{} 未找到对应初始化 SQL 语句!", dbType);
             return;
         }
@@ -176,8 +212,62 @@ public class SqlInitManager {
     /**
      *  初始化 sql 执行完成后执行
      */
-    protected void after() {
+    protected void afterInitSql() {
         log.error("完成执行数据库初始化 SQL!");
     }
 
+
+    /**
+     *  初始化构建多数据源，指定默认的数据源，如果要支持分布式 seta
+     */
+    public void initMultiDatasource() {
+
+        Map<String, Map<String, String>> datasource = this.selectDataSource();
+
+        FlexDataSource flexDataSource = null;
+        for (Map.Entry<String, Map<String, String>> entry : datasource.entrySet()) {
+            DataSource dataSource = new DataSourceBuilder(entry.getValue()).build();
+            if (flexDataSource == null) {
+                flexDataSource = new FlexDataSource(entry.getKey(), dataSource, false);
+            } else {
+                flexDataSource.addDataSource(entry.getKey(), dataSource, false);
+            }
+        }
+        this.flexDataSource = flexDataSource;
+    }
+
+
+    /**
+     *  选择应用使用的数据源
+     * @return 返回当前应用需要使用的数据库
+     */
+    public Map<String, Map<String, String>> selectDataSource() {
+        Map<String, Map<String, String>> datasource = this.mybatisFlexProperties.getDatasource();
+        List<String> selectedDatabase = this.getSelectedDatabase();
+        if (CollectionUtils.isEmpty(selectedDatabase)) {
+            Object defaultSourceValue = this.mybatisFlexProperties.getConfigurationProperties().get(DataSourcePropKeyEnum.DEFAULT_DB.getName());
+            String defaultDataSourceKey = defaultSourceValue != null ? defaultSourceValue.toString() : DataSourcePropKeyEnum.DEFAULT_DB.getName();
+            selectedDatabase = Arrays.asList(StringUtils.split(defaultDataSourceKey, ","));
+        }
+        datasource.keySet().retainAll(selectedDatabase);
+        return datasource;
+    }
+
+
+    /**
+     *  获取配置的数据源信息
+     * @return
+     */
+    public MybatisFlexProperties getMybatisFlexProperties() {
+        return this.mybatisFlexProperties;
+    }
+
+
+    /**
+     *  获取应用初始化的多数据源信息
+     * @return 返回数据源信息
+     */
+    public FlexDataSource getFlexDataSource() {
+        return this.flexDataSource;
+    }
 }

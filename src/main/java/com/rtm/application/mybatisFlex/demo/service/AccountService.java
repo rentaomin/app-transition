@@ -10,4 +10,6 @@ public interface AccountService {
     Account selectGBase(String id);
 
     List<Account> selectAll();
+
+    int insert(Account account);
 }

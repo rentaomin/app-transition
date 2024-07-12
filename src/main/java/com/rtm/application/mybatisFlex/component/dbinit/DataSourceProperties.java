@@ -65,7 +65,7 @@ public class DataSourceProperties {
      * @return 返回对应的数据源基础属性信息
      */
     public Map<String, String> getDatasource(DbType dataSourceType) {
-        return getDatasource(dataSourceType.getName());
+        return this.datasource.get(dataSourceType.getName());
     }
 
 
