@@ -17,16 +17,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  *  该组件主要提供应用服务启动时初始化 SQL 执行逻辑
+ * @author rtm
  */
 @Slf4j
 public class SqlInitManager {
@@ -86,7 +83,7 @@ public class SqlInitManager {
 
         beforeInitSql();
 
-        initSql(this::doInitSql);
+        initSql(this::initConsumer);
 
         afterInitSql();
     }
@@ -115,7 +112,7 @@ public class SqlInitManager {
      *  开始执行初始化 sql
      * @param datasourceProperties 数据源信息
      */
-    private void doInitSql(Map<String,String> datasourceProperties) {
+    private void initConsumer(Map<String,String> datasourceProperties) {
 
         if (CollectionUtils.isEmpty(sqlInitStatements)) {
             return;
@@ -124,8 +121,8 @@ public class SqlInitManager {
             log.error("未配置数据源信息，请检查数据源信息配置！");
             return;
         }
-        Map<DbType, SqlInitStatement> sqlInitStatementMap = sqlInitStatements.stream()
-                .collect(Collectors.toMap(SqlInitStatement::getDbType, Function.identity()));
+        Map<DbType, List<SqlInitStatement>> sqlInitStatementMap = sqlInitStatements.stream()
+                .collect(Collectors.groupingBy(SqlInitStatement::getDbType));
 
         if (MapUtils.isEmpty(sqlInitStatementMap)) {
             log.error("未找到初始化数据库 SQL 脚本，跳过初始化！");
@@ -134,12 +131,26 @@ public class SqlInitManager {
 
         String url = extractBaseUrl(datasourceProperties.get("url"));
         DbType dbType = DbTypeUtil.parseDbType(url);
-        SqlInitStatement sqlInitStatement = sqlInitStatementMap.get(dbType);
-        if (sqlInitStatement == null) {
+        List<SqlInitStatement> sqlInitStmts = sqlInitStatementMap.get(dbType);
+        if (CollectionUtils.isEmpty(sqlInitStmts)) {
             log.error("数据库：{} 未找到对应初始化 SQL 语句!", dbType);
             return;
         }
-        if (!sqlInitStatement.enable()) {
+
+        sqlInitStmts.stream()
+                .sorted(Comparator.comparingInt(SqlInitStatement::getOrder))
+                .forEach(sqlInitStatement -> executeSqlStatements(sqlInitStatement, dbType, datasourceProperties));
+    }
+
+
+    /**
+     * 执行 sql语句校验处理
+     * @param sqlInitStatement 需要执行的 sql 语句
+     * @param dbType 数据库类型
+     * @param datasourceProperties 数据源信息
+     */
+    private void executeSqlStatements(SqlInitStatement sqlInitStatement, DbType dbType, Map<String, String> datasourceProperties) {
+        if (sqlInitStatement == null || !sqlInitStatement.enable()) {
             log.error("数据库：{} 未开启执行初始化 SQL 脚本，跳过执行初始化！", dbType);
             return;
         }
@@ -154,7 +165,17 @@ public class SqlInitManager {
             log.error("数据库：{} 初始化 SQL 脚本为空，跳过执行初始化！", dbType);
             return;
         }
-        // GBase 驱动存在有时无法注册，进行主动加载
+
+        this.loadJdbcDriverIfNecessary(dbType);
+        this.executeSqlList(sqlStatements, dbType, datasourceProperties, sqlInitStatement);
+    }
+
+
+    /**
+     *  主动加载 JDBC 驱动
+     * @param dbType 数据库类型
+     */
+    private void loadJdbcDriverIfNecessary(DbType dbType) {
         if (DbType.GBASE_8S.equals(dbType)) {
             try {
                 Class.forName("com.gbasedbt.jdbc.Driver");
@@ -163,11 +184,27 @@ public class SqlInitManager {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+
+    /**
+     *  执行初始化 SQL
+     * @param sqlStatements 需要执行的初始化 SQL
+     * @param dbType 数据库类型
+     * @param datasourceProperties 数据源信息
+     * @param sqlInitStatement  要执行初始化回调的对象
+     */
+    public void executeSqlList(List<String> sqlStatements, DbType dbType,
+               Map<String, String> datasourceProperties, SqlInitStatement sqlInitStatement) {
+
+        String url = extractBaseUrl(datasourceProperties.get("url"));
         String username = datasourceProperties.get("username");
         String password = datasourceProperties.get("password");
         boolean executeSuccess = false;
+
         try (Connection connection = DriverManager.getConnection(url, username, password);
              Statement statement = connection.createStatement()) {
+
             for (String sql : sqlStatements) {
                 try {
                     statement.execute(sql);
@@ -209,6 +246,7 @@ public class SqlInitManager {
         }
         return url;
     }
+
 
     /**
      *  初始化 sql 执行完成后执行

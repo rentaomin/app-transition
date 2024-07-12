@@ -9,7 +9,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class MysqlSqlInitStatement implements SqlInitStatement {
+public class MysqlDupSqlInitStatement implements SqlInitStatement {
 
     private boolean init = false;
 

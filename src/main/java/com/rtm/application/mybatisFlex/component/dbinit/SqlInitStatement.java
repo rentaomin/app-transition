@@ -51,4 +51,12 @@ public interface SqlInitStatement {
         return DbType.MYSQL;
     }
 
+    /**
+     *  多业务模块下 sql 语句执行顺序优先级，仅在同一个数据库类型下生效,值越大越优先
+     * @return 返回当前顺序优先级，默认为 1
+     */
+    default int getOrder() {
+        return 1;
+    }
+
 }
