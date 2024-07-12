@@ -34,7 +34,7 @@ public class SqlInitManager {
     /**
      *  多数据源配置属性
      */
-    private MybatisFlexProperties mybatisFlexProperties;
+    private final MybatisFlexProperties mybatisFlexProperties;
 
     /**
      *  应用多数据源
@@ -44,12 +44,12 @@ public class SqlInitManager {
     /**
      *  初始化 sql 语句接口，负责提供需要执行初始化的 sql
      */
-    private List<SqlInitStatement> sqlInitStatements;
+    private final List<SqlInitStatement> sqlInitStatements;
 
     /**
      *  初始化执行 SQL 错误处理器
      */
-    private SqlExecuteErrorHandler sqlExecuteErrorHandler;
+    private final SqlExecuteErrorHandler sqlExecuteErrorHandler;
 
 
     public SqlInitManager(MybatisFlexProperties mybatisFlexProperties, List<SqlInitStatement> sqlInitStatements,
@@ -121,6 +121,7 @@ public class SqlInitManager {
             return;
         }
         if (MapUtils.isEmpty(datasourceProperties)) {
+            log.error("未配置数据源信息，请检查数据源信息配置！");
             return;
         }
         Map<DbType, SqlInitStatement> sqlInitStatementMap = sqlInitStatements.stream()
@@ -256,7 +257,6 @@ public class SqlInitManager {
 
     /**
      *  获取配置的数据源信息
-     * @return
      */
     public MybatisFlexProperties getMybatisFlexProperties() {
         return this.mybatisFlexProperties;
