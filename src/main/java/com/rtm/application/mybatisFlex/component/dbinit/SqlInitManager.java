@@ -288,8 +288,13 @@ public class SqlInitManager {
             String defaultDataSourceKey = defaultSourceValue != null ? defaultSourceValue.toString() : DataSourcePropKeyEnum.DEFAULT_DB.getName();
             selectedDatabase = Arrays.asList(StringUtils.split(defaultDataSourceKey, ","));
         }
-        datasource.keySet().retainAll(selectedDatabase);
-        return datasource;
+        Map<String, Map<String, String>> finalDataSource = new LinkedHashMap<>();
+        for (String select : selectedDatabase) {
+            if (datasource.containsKey(select)) {
+                finalDataSource.put(select, datasource.get(select));
+            }
+        }
+        return finalDataSource;
     }
 
 
