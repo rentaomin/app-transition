@@ -1,12 +1,12 @@
 -- 日期类型数据测试
-CREATE TABLE testdb:tb_account(
+CREATE TABLE tb_account(
     id      INTEGER PRIMARY key ,
     user_name VARCHAR(100),
     age      INTEGER,
     birthday  datetime year to second
 );
 
-INSERT INTO testdb:tb_account(id, user_name, age, birthdate) VALUES (1, '张三', 18, '2020-01-11 14:01:32'),(2, '李四', 19, '2021-03-21  12:02:01');
+INSERT INTO tb_account(id, user_name, age, birthdate) VALUES (1, '张三', 18, '2020-01-11 14:01:32'),(2, '李四', 19, '2021-03-21  12:02:01');
 
 -- 创建表
 create table tab_dt
