@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rtm.application.mybatisFlex.demo.mapper.ServiceStatusInfoMapper">
+  <resultMap id="BaseResultMap" type="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="modifyTime" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="serviceName" jdbcType="VARCHAR" property="serviceName" />
+    <result column="total" jdbcType="INTEGER" property="total" />
+    <result column="active" jdbcType="INTEGER" property="active" />
+    <result column="endpointId" jdbcType="INTEGER" property="endpointId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id,  modifyTime, serviceName, total, active, endpointId
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_service_status_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_service_status_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    insert into t_service_status_info (id, modifyTime, serviceName, 
+      total, active, endpointId
+      )
+    values (#{id,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{serviceName,jdbcType=VARCHAR},
+      #{total,jdbcType=INTEGER}, #{active,jdbcType=INTEGER}, #{endpointId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    insert into t_service_status_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="modifyTime != null">
+        modifyTime,
+      </if>
+      <if test="serviceName != null">
+        serviceName,
+      </if>
+      <if test="total != null">
+        total,
+      </if>
+      <if test="active != null">
+        active,
+      </if>
+      <if test="endpointId != null">
+        endpointId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceName != null">
+        #{serviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="total != null">
+        #{total,jdbcType=INTEGER},
+      </if>
+      <if test="active != null">
+        #{active,jdbcType=INTEGER},
+      </if>
+      <if test="endpointId != null">
+        #{endpointId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    update t_service_status_info
+    <set>
+      <if test="modifyTime != null">
+        modifyTime = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceName != null">
+        serviceName = #{serviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="total != null">
+        total = #{total,jdbcType=INTEGER},
+      </if>
+      <if test="active != null">
+        active = #{active,jdbcType=INTEGER},
+      </if>
+      <if test="endpointId != null">
+        endpointId = #{endpointId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    update t_service_status_info
+    set modifyTime = #{modifyTime,jdbcType=TIMESTAMP},
+      serviceName = #{serviceName,jdbcType=VARCHAR},
+      total = #{total,jdbcType=INTEGER},
+      active = #{active,jdbcType=INTEGER},
+      endpointId = #{endpointId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByServiceName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from t_service_status_info
+    where serviceName = #{serviceName,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryByServiceNameAndEndpoint"
+          resultType="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    select
+    <include refid="Base_Column_List" />
+    from t_service_status_info
+    where serviceName = #{serviceName,jdbcType=VARCHAR}
+    and endpointId = #{endpointId,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryTotal" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(id) from t_service_status_info
+    <where>
+      <if test="modifyTime != null">
+        and modifyTime = #{modifyTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="serviceName != null">
+        and serviceName = #{serviceName,jdbcType=VARCHAR}
+      </if>
+      <if test="total != null">
+        and total = #{total,jdbcType=INTEGER}
+      </if>
+      <if test="active != null">
+        and active = #{active,jdbcType=INTEGER}
+      </if>
+      <if test="endpointId != null">
+        and endpointId = #{endpointId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+
+  <select id="queryServiceInfoList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_service_status_info
+    <where>
+      <if test="modifyTime != null">
+        and modifyTime = #{modifyTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="serviceName != null">
+        and serviceName = #{serviceName,jdbcType=VARCHAR}
+      </if>
+      <if test="total != null">
+        and total = #{total,jdbcType=INTEGER}
+      </if>
+      <if test="active != null">
+        and active = #{active,jdbcType=INTEGER}
+      </if>
+      <if test="endpointId != null">
+        and endpointId = #{endpointId,jdbcType=INTEGER}
+      </if>
+    </where>
+        order by serviceName
+    <include refid="common.pageUtils"/>
+  </select>
+
+  <delete id="deleteExpireInfoByDate" parameterType="java.lang.String">
+    delete from t_service_status_info where modifyTime <![CDATA[ <= #{expireTime} ]]>
+  </delete>
+
+  <select id="queryNeedToBeAlarmInfoInTimeScope" parameterType="java.lang.String" resultType="com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo">
+    select active, endpointId
+    from (SELECT SUM(active) as active,
+                 endpointId
+          FROM t_service_status_info
+          where serviceName like concat('%', #{serviceName}, '%')
+          GROUP BY endpointId) as temp
+    where temp.active #{alarmCondition}
+  </select>
+
+  <delete id="deletaAll">
+    DELETE FROM t_service_status_info
+  </delete>
+
+</mapper>

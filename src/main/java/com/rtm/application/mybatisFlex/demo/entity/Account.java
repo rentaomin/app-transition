@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@Table("tb_account")
+@Table(value = "tb_account",dataSource = "mysql")
 public class Account implements Serializable {
 
     @Id(keyType = KeyType.Auto)

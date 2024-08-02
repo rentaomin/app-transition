@@ -7,12 +7,18 @@ server:
     max-swallow-size: 209715200
 
 mybatis-flex:
+  config-location:
+    - classpath*:mapper/mybatis-config.xml
+  mapper-locations:
+    - classpath*:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: false
   configurationProperties:
 #    指定默认数据源，该名称需要与数据源下配置的数据源名称一致,默认第一个为默认数据源，多个用英文逗号分割
-    defaultDb: mysql,gbase-8s
+    defaultDb: gbase-8s,mysql
   datasource:
     gbase-8s:
-      url: jdbc:gbasedbt-sqli://192.168.149.99:9088/aa:GBASEDBTSERVER=dtpMng;SQLMODE=GBase;DB_LOCALE=zh_CN.57372;
+      url: jdbc:gbasedbt-sqli://192.168.149.99:9088/bms_general_aa:GBASEDBTSERVER=dtpMng;SQLMODE=GBase;DB_LOCALE=zh_CN.57372;
       username: gbasedbt
       password: Ws-123456,.
       driver-class-name: com.gbasedbt.jdbc.Driver

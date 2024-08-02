@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rtm.application.governance.mybatis.mapper.SysUserMapper">
+    <resultMap id="sysUserMap" type="com.rtm.application.governance.mybatis.entity.SysUser">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="realname" jdbcType="VARCHAR" property="realName"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="salt" jdbcType="VARCHAR" property="salt"/>
+        <result column="roleid" jdbcType="VARCHAR" property="roleId"/>
+        <result column="admintype" jdbcType="INTEGER" property="adminType"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="themecolor" jdbcType="INTEGER" property="themeColor"/>
+        <result column="startip" jdbcType="VARCHAR" property="startIp"/>
+        <result column="endip" jdbcType="VARCHAR" property="endIp"/>
+        <result column="display" jdbcType="INTEGER" property="display"/>
+        <result column="isfirstlogin" jdbcType="INTEGER" property="isFirstLogin"/>
+        <result column="islocked" jdbcType="INTEGER" property="isLocked"/>
+        <result column="lastlogintime" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="lastloginip" jdbcType="VARCHAR" property="lastLoginIp"/>
+        <result column="nowlogintime" jdbcType="TIMESTAMP" property="nowLoginTime"/>
+        <result column="nowloginip" jdbcType="VARCHAR" property="nowLoginIp"/>
+        <result column="createtime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="creater" jdbcType="VARCHAR" property="creater"/>
+        <result column="updatetime" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="updater" jdbcType="VARCHAR" property="updater"/>
+        <result column="version" jdbcType="VARCHAR" property="version"/>
+        <result column="lastpwdmodtime" jdbcType="TIMESTAMP" property="lastPwdModTime"/>
+        <result column="lastlocktime" jdbcType="TIMESTAMP" property="lastLockTime"/>
+        <result column="lastpwdwrongtime" jdbcType="TIMESTAMP" property="lastPwdWrongTime"/>
+        <result column="pwderrornums" jdbcType="INTEGER" property="pwdErrorNums"/>
+        <result column="isremoved" jdbcType="INTEGER" property="isRemoved"/>
+    </resultMap>
+
+    <delete id="deleteExpireInfoByDate" parameterType="java.lang.String">
+        delete from t_service_status_info where modifyTime &lt;= #{expireTime}
+    </delete>
+
+    <select id="getSysMenuInfo" parameterType="map" resultType="map">
+        SELECT id as value ,
+        menuName as label
+        FROM t_sys_menu WHERE LENGTH(value) = #{length} and isAuth = 1
+    </select>
+
+    <update id="batchUpdateValueByPropKey" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update t_sys_admin
+            <set>
+                account=#{item.account}
+            </set>
+            where realname = #{item.realName}
+        </foreach>
+    </update>
+
+
+    <sql id="column">
+       id, account, realName, password, roleId, adminType,
+       email, mobile, themeColor, startIp, endIp,
+       display, isFirstLogin, isLocked, to_char(lastLoginTime, 'yyyy-MM-dd HH24:mi:ss') lastLoginTime,
+       lastLoginIp, to_char(nowLoginTime, 'yyyy-MM-dd HH24:mi:ss') nowLoginTime, nowLoginIp, isRemoved,
+       to_char(createTime, 'yyyy-MM-dd HH24:mi:ss') createTime, creater, to_char(updateTime, 'yyyy-MM-dd HH24:mi:ss') updateTime,
+       updater, to_char(lastPwdModTime, 'yyyy-MM-dd HH24:mi:ss') lastPwdModTime, to_char(lastLockTime, 'yyyy-MM-dd HH24:mi:ss') lastLockTime,
+       pwdErrorNums, to_char(lastPwdWrongTime, 'yyyy-MM-dd HH24:mi:ss') lastPwdWrongTime
+    </sql>
+
+    <select id="query" resultType="com.rtm.application.governance.mybatis.entity.SysUser">
+        select tsa.id,tsa.account,tsa.realName,tsa.email,tsa.mobile,tsa.themeColor,tsa.isLocked,
+        to_char(tsa.updateTime, 'yyyy-MM-dd HH24:mi:ss') updateTime, to_char(tsa.createTime, 'yyyy-MM-dd HH24:mi:ss') createTime,
+        tsr.roleName
+        from t_sys_admin tsa left join t_sys_role tsr on tsa.roleId = tsr.id
+        <where>
+            tsa.isRemoved = 0 and tsa.adminType != 0
+            <if test="filters.account != null and filters.account != ''">
+                and tsa.account like concat('%',#{filters.account},'%')
+            </if>
+            <if test="filters.roleId != null">
+                and tsa.roleId = #{filters.roleId}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="queryByAccount" resultType="com.rtm.application.governance.mybatis.entity.SysUser">
+        select <include refid="column"/>
+        from t_sys_admin
+        where account = #{account}
+        and isRemoved = 0
+    </select>
+
+    <select id="queryExistUserAccount" resultType="java.lang.Integer">
+        select count(1)
+        from t_sys_admin
+        where account = #{account}
+        and isRemoved = 0
+    </select>
+    <select id="queryByUserId" resultType="com.rtm.application.governance.mybatis.entity.SysUser">
+        select <include refid="column"/>
+        from t_sys_admin
+        where id = #{userId}
+        and isRemoved = 0
+    </select>
+    <select id="queryUserNamesByRoleId" resultType="java.lang.String">
+        select realName from t_sys_admin
+        where roleId = #{roleId} and isRemoved = 0
+    </select>
+
+    <select id="queryUserSidsByRoleId" resultType="java.lang.String">
+        select id from t_sys_admin
+        where roleId = #{roleId} and isRemoved = 0
+    </select>
+    <select id="queryAdminsSid" resultType="java.lang.String">
+        SELECT id FROM t_sys_admin WHERE id != 'B5A33586-15104954-9B752AE1-53333EC10' AND isRemoved != 1
+    </select>
+    <select id="queryExistUserAccountIncludeDel" resultType="java.lang.Integer">
+        select count(1)
+        from t_sys_admin
+        where account = #{account}
+    </select>
+    <insert id="insert" parameterType="com.rtm.application.governance.mybatis.entity.SysUser">
+      INSERT INTO t_sys_admin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                id,
+            </if>
+            <if test="account!=null">
+                account,
+            </if>
+            <if test="realName!=null">
+                realName,
+            </if>
+            <if test="password!=null">
+                password,
+            </if>
+            <if test="salt!=null">
+                salt,
+            </if>
+            <if test="roleId!=null">
+                roleId,
+            </if>
+            <if test="adminType!=null">
+                adminType,
+            </if>
+            <if test="email!=null">
+                email,
+            </if>
+            <if test="mobile!=null">
+                mobile,
+            </if>
+            <if test="startIp!=null">
+                startIp,
+            </if>
+            <if test="endIp!=null">
+                endIp,
+            </if>
+            <if test="display!=null">
+                display,
+            </if>
+            <if test="isFirstLogin!=null">
+                isFirstLogin,
+            </if>
+            <if test="isLocked!=null">
+                isLocked,
+            </if>
+            <if test="lastLoginTime!=null">
+                lastLoginTime,
+            </if>
+            <if test="lastLoginIp!=null">
+                lastLoginIp,
+            </if>
+            <if test="isRemoved!=null">
+                isRemoved,
+            </if>
+            <if test="nowLoginTime!=null">
+                nowLoginTime,
+            </if>
+            <if test="nowLoginIp!=null">
+                nowLoginIp,
+            </if>
+            <if test="createTime!=null">
+                createTime,
+            </if>
+            <if test="creater!=null">
+                creater,
+            </if>
+            <if test="updateTime!=null">
+                updateTime,
+            </if>
+            <if test="updater!=null">
+                updater,
+            </if>
+            <if test="version!=null">
+                version,
+            </if>
+            <if test="lastPwdModTime!=null">
+                lastPwdModTime,
+            </if>
+            <if test="lastLockTime!=null">
+                lastLockTime,
+            </if>
+            <if test="pwdErrorNums!=null">
+                pwdErrorNums,
+            </if>
+            <if test="lastPwdWrongTime!=null">
+                lastPwdWrongTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id!=null">
+                #{id},
+            </if>
+            <if test="account!=null">
+                #{account},
+            </if>
+            <if test="realName!=null">
+                #{realName},
+            </if>
+            <if test="password!=null">
+                #{password},
+            </if>
+            <if test="salt!=null">
+                #{salt},
+            </if>
+            <if test="roleId!=null">
+                #{roleId},
+            </if>
+            <if test="adminType!=null">
+                #{adminType},
+            </if>
+            <if test="email!=null">
+                #{email},
+            </if>
+            <if test="mobile!=null">
+                #{mobile},
+            </if>
+            <if test="startIp!=null">
+                #{startIp},
+            </if>
+            <if test="endIp!=null">
+                #{endIp},
+            </if>
+            <if test="display!=null">
+                #{display},
+            </if>
+            <if test="isFirstLogin!=null">
+                #{isFirstLogin},
+            </if>
+            <if test="isLocked!=null">
+                #{isLocked},
+            </if>
+            <if test="lastLoginTime!=null">
+                #{lastLoginTime},
+            </if>
+            <if test="lastLoginIp!=null">
+                #{lastLoginIp},
+            </if>
+            <if test="isRemoved!=null">
+                #{isRemoved},
+            </if>
+            <if test="nowLoginTime!=null">
+                #{nowLoginTime},
+            </if>
+            <if test="nowLoginIp!=null">
+                #{nowLoginIp},
+            </if>
+            <if test="createTime!=null">
+                #{createTime},
+            </if>
+            <if test="creater!=null">
+                #{creater},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime},
+            </if>
+            <if test="updater!=null">
+                #{updater},
+            </if>
+            <if test="version!=null">
+                #{version},
+            </if>
+            <if test="lastPwdModTime!=null">
+                #{lastPwdModTime},
+            </if>
+            <if test="lastLockTime!=null">
+                #{lastLockTime},
+            </if>
+            <if test="pwdErrorNums!=null">
+                #{pwdErrorNums},
+            </if>
+            <if test="lastPwdWrongTime!=null">
+                #{lastPwdWrongTime},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.rtm.application.governance.mybatis.entity.SysUser">
+        UPDATE t_sys_admin
+        <set>
+            <if test="account!=null">
+                account=#{account},
+            </if>
+            <if test="realName!=null">
+                realName=#{realName},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="salt!=null">
+                salt=#{salt},
+            </if>
+            <if test="roleId!=null">
+                roleId=#{roleId},
+            </if>
+            <if test="adminType!=null">
+                adminType=#{adminType},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="mobile!=null">
+                mobile=#{mobile},
+            </if>
+            <if test="themeColor!=null">
+                themeColor=#{themeColor},
+            </if>
+            <if test="startIp!=null">
+                startIp=#{startIp},
+            </if>
+            <if test="endIp!=null">
+                endIp=#{endIp},
+            </if>
+            <if test="display!=null">
+                display=#{display},
+            </if>
+            <if test="isFirstLogin!=null">
+                isFirstLogin=#{isFirstLogin},
+            </if>
+            <if test="isLocked!=null">
+                isLocked=#{isLocked},
+            </if>
+            <if test="lastLoginTime!=null">
+                lastLoginTime=#{lastLoginTime},
+            </if>
+            <if test="lastLoginIp!=null">
+                lastLoginIp=#{lastLoginIp},
+            </if>
+            <if test="isRemoved!=null">
+                isRemoved=#{isRemoved},
+            </if>
+            <if test="nowLoginTime!=null">
+                nowLoginTime=#{nowLoginTime},
+            </if>
+            <if test="nowLoginIp!=null">
+                nowLoginIp=#{nowLoginIp},
+            </if>
+            <if test="createTime!=null">
+                createTime=#{createTime},
+            </if>
+            <if test="creater!=null">
+                creater=#{creater},
+            </if>
+            <if test="updateTime!=null">
+                updateTime=#{updateTime},
+            </if>
+            <if test="updater!=null">
+                updater=#{updater},
+            </if>
+            <if test="version!=null">
+                version=#{version},
+            </if>
+            <if test="lastPwdModTime!=null">
+                lastPwdModTime=#{lastPwdModTime},
+            </if>
+            <if test="lastLockTime!=null">
+                lastLockTime=#{lastLockTime},
+            </if>
+            <if test="pwdErrorNums!=null">
+                pwdErrorNums=#{pwdErrorNums},
+            </if>
+            <if test="lastPwdWrongTime!=null">
+                lastPwdWrongTime=#{lastPwdWrongTime},
+            </if>
+        </set>
+        where id=#{id}  AND isRemoved = 0
+    </update>
+    <update id="remove">
+        update t_sys_admin set isRemoved = 1 where id = #{id}
+    </update>
+    <update id="updateAll" parameterType="com.rtm.application.governance.mybatis.entity.SysUser">
+        UPDATE t_sys_admin
+        <set>
+            <if test="realName!=null">
+                realName=#{realName},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="salt!=null">
+                salt=#{salt},
+            </if>
+            <if test="roleId!=null">
+                roleId=#{roleId},
+            </if>
+            <if test="adminType!=null">
+                adminType=#{adminType},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="mobile!=null">
+                mobile=#{mobile},
+            </if>
+            <if test="startIp!=null">
+                startIp=#{startIp},
+            </if>
+            <if test="endIp!=null">
+                endIp=#{endIp},
+            </if>
+            <if test="display!=null">
+                display=#{display},
+            </if>
+            <if test="isFirstLogin!=null">
+                isFirstLogin=#{isFirstLogin},
+            </if>
+            <if test="isLocked!=null">
+                isLocked=#{isLocked},
+            </if>
+            <if test="lastLoginTime!=null">
+                lastLoginTime=#{lastLoginTime},
+            </if>
+            <if test="lastLoginIp!=null">
+                lastLoginIp=#{lastLoginIp},
+            </if>
+            <if test="isRemoved!=null">
+                isRemoved=#{isRemoved},
+            </if>
+            <if test="nowLoginTime!=null">
+                nowLoginTime=#{nowLoginTime},
+            </if>
+            <if test="nowLoginIp!=null">
+                nowLoginIp=#{nowLoginIp},
+            </if>
+            <if test="createTime!=null">
+                createTime=#{createTime},
+            </if>
+            <if test="creater!=null">
+                creater=#{creater},
+            </if>
+            <if test="updateTime!=null">
+                updateTime=#{updateTime},
+            </if>
+            <if test="updater!=null">
+                updater=#{updater},
+            </if>
+            <if test="version!=null">
+                version=#{version},
+            </if>
+            <if test="lastPwdModTime!=null">
+                lastPwdModTime=#{lastPwdModTime},
+            </if>
+            <if test="lastLockTime!=null">
+                lastLockTime=#{lastLockTime},
+            </if>
+            <if test="pwdErrorNums!=null">
+                pwdErrorNums=#{pwdErrorNums},
+            </if>
+            <if test="lastPwdWrongTime!=null">
+                lastPwdWrongTime=#{lastPwdWrongTime},
+            </if>
+            <if test="isRemoved!=null">
+                isRemoved=#{isRemoved},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete">
+        delete  from t_sys_admin  where id = #{id}
+    </delete>
+
+    <update id="updateDefaultUserStatus" parameterType="com.rtm.application.governance.mybatis.entity.SysUser">
+        UPDATE t_sys_admin
+        <set>
+            lastLockTime=#{lastLockTime},
+            <if test="account!=null">
+                account=#{account},
+            </if>
+            <if test="realName!=null">
+                realName=#{realName},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="salt!=null">
+                salt=#{salt},
+            </if>
+            <if test="roleId!=null">
+                roleId=#{roleId},
+            </if>
+            <if test="adminType!=null">
+                adminType=#{adminType},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="mobile!=null">
+                mobile=#{mobile},
+            </if>
+            <if test="themeColor!=null">
+                themeColor=#{themeColor},
+            </if>
+            <if test="startIp!=null">
+                startIp=#{startIp},
+            </if>
+            <if test="endIp!=null">
+                endIp=#{endIp},
+            </if>
+            <if test="display!=null">
+                display=#{display},
+            </if>
+            <if test="isFirstLogin!=null">
+                isFirstLogin=#{isFirstLogin},
+            </if>
+            <if test="isLocked!=null">
+                isLocked=#{isLocked},
+            </if>
+            <if test="lastLoginTime!=null">
+                lastLoginTime=#{lastLoginTime},
+            </if>
+            <if test="lastLoginIp!=null">
+                lastLoginIp=#{lastLoginIp},
+            </if>
+            <if test="isRemoved!=null">
+                isRemoved=#{isRemoved},
+            </if>
+            <if test="nowLoginTime!=null">
+                nowLoginTime=#{nowLoginTime},
+            </if>
+            <if test="nowLoginIp!=null">
+                nowLoginIp=#{nowLoginIp},
+            </if>
+            <if test="createTime!=null">
+                createTime=#{createTime},
+            </if>
+            <if test="creater!=null">
+                creater=#{creater},
+            </if>
+            <if test="updateTime!=null">
+                updateTime=#{updateTime},
+            </if>
+            <if test="updater!=null">
+                updater=#{updater},
+            </if>
+            <if test="version!=null">
+                version=#{version},
+            </if>
+            <if test="lastPwdModTime!=null">
+                lastPwdModTime=#{lastPwdModTime},
+            </if>
+            <if test="pwdErrorNums!=null">
+                pwdErrorNums=#{pwdErrorNums},
+            </if>
+            <if test="lastPwdWrongTime!=null">
+                lastPwdWrongTime=#{lastPwdWrongTime},
+            </if>
+        </set>
+        where id=#{id}  AND isRemoved = 0
+    </update>
+
+    <select id="querySysUserList" resultType="com.rtm.application.governance.mybatis.entity.SysUser">
+        select tsa.id,tsa.account,tsa.realName,tsa.email,tsa.mobile,tsa.themeColor,tsa.isLocked,
+        to_char(tsa.updateTime, 'yyyy-MM-dd HH24:mi:ss') updateTime, to_char(tsa.createTime, 'yyyy-MM-dd HH24:mi:ss') createTime,
+        tsr.roleName
+        from t_sys_admin tsa left join t_sys_role tsr on tsa.roleId = tsr.id
+        where tsa.isRemoved = 0
+    </select>
+
+    <select id="queryAllSysUserInfo" resultType="java.lang.String">
+        select id
+        from t_sys_admin
+        where roleId IN ('1','2') and isRemoved = 0
+    </select>
+
+    <select id="querySysUserBySid" resultType="com.rtm.application.governance.mybatis.entity.SysUser">
+        select tsa.id,tsa.account,tsa.realName,tsa.email,tsa.mobile,tsa.themeColor,tsa.isLocked,
+        tsa.updateTime,tsa.createTime,tsr.roleName
+        from t_sys_admin tsa left join t_sys_role tsr on tsa.roleId = tsr.id
+        <where>
+            tsa.isRemoved = 0 and tsa.adminType != 0
+            and tsa.id in
+            <foreach collection="filters.list" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+            <if test="filters.account != null and filters.account != ''">
+                and tsa.account like concat('%',#{filters.account},'%')
+            </if>
+            <if test="filters.roleId != null">
+                and tsa.roleId = #{filters.roleId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

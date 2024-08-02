@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+    <sql id="pageUtil">
+        limit
+        <choose>
+            <when test="page!=null and page!=''">#{page}</when>
+            <when test="page==0">#{page}</when>
+            <otherwise>0</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="rows!=null and rows!=''">#{rows}</when>
+            <when test="rows==0">#{rows}</when>
+            <otherwise>10</otherwise>
+        </choose>
+    </sql>
+    <sql id="pageUtils">
+        limit
+        <choose>
+            <when test="pageNum!=null and pageNum!=''">#{pageNum}</when>
+            <when test="pageNum==0">#{pageNum}</when>
+            <otherwise>0</otherwise>
+        </choose>
+        ,
+        <choose>
+            <when test="pageSize!=null and pageSize!=''">#{pageSize}</when>
+            <when test="pageSize==0">#{pageSize}</when>
+            <otherwise>10</otherwise>
+        </choose>
+    </sql>
+    <sql id="sequence">
+        <!-- MySQL -->
+        select LAST_INSERT_ID() as value
+        <!-- Oracle SEQUENCE Example using .NET 1.1 System.Data.OracleClient -->
+        <!--
+        SELECT STOCKIDSEQUENCE.NEXTVAL AS VALUE FROM DUAL
+        -->
+        <!-- Microsoft SQL Server IDENTITY Column Example -->
+        <!--
+        select @@IDENTITY as value
+        -->
+    </sql>
+</mapper>
