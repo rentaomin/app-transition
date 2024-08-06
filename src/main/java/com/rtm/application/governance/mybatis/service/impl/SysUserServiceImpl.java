@@ -1,11 +1,16 @@
 package com.rtm.application.governance.mybatis.service.impl;
 
-import com.mybatisflex.core.query.QueryWrapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.rtm.application.governance.mybatis.entity.SysUser;
 import com.rtm.application.governance.mybatis.mapper.SysMapper;
 import com.rtm.application.governance.mybatis.mapper.SysUserMapper;
 import com.rtm.application.governance.mybatis.service.SysUserService;
+import com.rtm.application.mybatisFlex.demo.entity.PageQueryResult;
+import com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo;
 import com.rtm.application.mybatisFlex.demo.mapper.ServiceStatusInfoMapper;
+import com.rtm.application.mybatisFlex.demo.mapper.SystemParamConfigMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -112,14 +117,47 @@ public class SysUserServiceImpl implements SysUserService {
         return sysUserMapper.query(filters);
     }
 
+
+    @Resource
+    private SystemParamConfigMapper systemParamConfigMapper;
+
     @Override
     public SysUser queryByAccount(String account) {
-        int i = serviceStatusInfoMapper.deleteExpireInfoByDate("2024-08-01 13:35:30");
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq(SysUser::getRealName,"admin");
-        List<SysUser> sysUsers = sysMapper.selectListByQuery(queryWrapper);
-        System.out.println(sysUsers.size());
-        return sysUserMapper.queryByAccount(account);
+
+        PageQueryResult pageQueryResult = queryRoleList(2, 3);
+        System.out.println(pageQueryResult);
+//        int i = serviceStatusInfoMapper.deleteExpireInfoByDate("2024-08-01 13:35:30");
+//        QueryWrapper queryWrapper = new QueryWrapper();
+//        queryWrapper.eq(SysUser::getRealName,"admin");
+//        List<SysUser> sysUsers = sysMapper.selectListByQuery(queryWrapper);
+//        System.out.println(sysUsers.size());
+//        SysUser user = sysUserMapper.queryByAccount(account);
+        return null;
+    }
+
+    public PageQueryResult queryRoleList(Integer pageNum, Integer pageSize) {
+        PageQueryResult pageQueryResult = new PageQueryResult();
+
+        Map<String,Object> param = new HashMap<>();
+        // 不翻页查询
+        if (StringUtils.isEmpty(pageNum.toString()) || StringUtils.isEmpty(pageSize.toString())){
+            List<ServiceStatusInfo> roleInfoList = serviceStatusInfoMapper.list(param);
+            pageQueryResult.setTotalCount(roleInfoList.size());
+            pageQueryResult.setList(roleInfoList);
+        } else {
+            Page<Object> page = PageHelper.startPage(pageNum, pageSize, true);
+            System.out.println(page);
+            param.put("timeLength",12);
+            List<ServiceStatusInfo> roleInfoList = null;
+            try {
+                roleInfoList = serviceStatusInfoMapper.list(param);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            pageQueryResult.setTotalCount(page.getTotal());
+            pageQueryResult.setList(roleInfoList);
+        }
+        return pageQueryResult;
     }
 
     @Override

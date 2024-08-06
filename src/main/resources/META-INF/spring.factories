@@ -1,2 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.rtm.application.configure.AppTransitionAutoConfigure
+#org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+#com.rtm.application.configure.AppTransitionAutoConfigure,com.rtm.application.mybatisFlex.page.PageConfiguration

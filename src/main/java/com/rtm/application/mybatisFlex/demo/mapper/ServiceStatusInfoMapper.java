@@ -3,6 +3,7 @@ package com.rtm.application.mybatisFlex.demo.mapper;
 import com.rtm.application.mybatisFlex.demo.entity.ServiceStatusInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Map;
 
@@ -33,4 +34,6 @@ public interface ServiceStatusInfoMapper {
     List<ServiceStatusInfo> queryNeedToBeAlarmInfoInTimeScope(@Param("alarmCondition") String alarmCondition,@Param("serviceName") String serviceName);
 
     int deletaAll();
+
+    List<ServiceStatusInfo> list(Map<String,Object> param);
 }

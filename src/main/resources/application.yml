@@ -18,7 +18,7 @@ mybatis-flex:
     defaultDb: gbase-8s,mysql
   datasource:
     gbase-8s:
-      url: jdbc:gbasedbt-sqli://192.168.149.99:9088/bms_general_aa:GBASEDBTSERVER=dtpMng;SQLMODE=GBase;DB_LOCALE=zh_CN.57372;
+      url: jdbc:gbasedbt-sqli://192.168.149.99:9088/bms_general_aa:GBASEDBTSERVER=dtpMng;delimident=y;SQLMODE=GBase;DB_LOCALE=zh_CN.57372;
       username: gbasedbt
       password: Ws-123456,.
       driver-class-name: com.gbasedbt.jdbc.Driver
@@ -110,9 +110,18 @@ spring:
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
   main:
     allow-circular-references: true
+    allow-bean-definition-overriding: true
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+pagehelper:
+#  dialect: com.rtm.application.mybatisFlex.page.GBaseDialect
+  helper-dialect: com.rtm.application.mybatisFlex.page.GBaseDialect
+  reasonable: true
+
+#pagehelper:
+#  helper-dialect: mysql
+#  reasonable: true

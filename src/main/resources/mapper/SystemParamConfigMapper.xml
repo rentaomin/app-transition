@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rtm.application.mybatisFlex.demo.mapper.SystemParamConfigMapper">
+    <resultMap id="systemParamConfigMap"
+               type="com.rtm.application.mybatisFlex.demo.entity.SystemParamConfigEntity">
+        <id column="id" property="id"/>
+        <result column="createTime" property="createTime"/>
+        <result column="createUser" property="createUser"/>
+        <result column="modifyTime" property="modifyTime"/>
+        <result column="modifyUser" property="modifyUser"/>
+        <result column="sysParamKey" property="sysParamKey"/>
+        <result column="paramType" property="paramType"/>
+        <result column="propKey" property="propKey"/>
+        <result column="propName" property="propName"/>
+        <result column="propValue" property="propValue"/>
+        <result column="propValidExpr" property="propValidExpr"/>
+        <result column="propValue" property="propValue"/>
+        <result column="propTips" property="propTips"/>
+        <result column="isPassword" property="isPassword"/>
+        <result column="isShow" property="isShow"/>
+        <result column="isRequiredField" property="isRequiredField"/>
+        <result column="isEdit" property="isEdit"/>
+        <result column="paramDesc" property="paramDesc"/>
+        <result column="componentType" property="componentType"/>
+        <result column="optionalValues" property="optionalValues"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.rtm.application.mybatisFlex.demo.entity.EndpointInfo">
+        <id column="endpointId" jdbcType="INTEGER" property="endpointId" />
+        <id column="ip" jdbcType="VARCHAR" property="ip" />
+        <result column="endpointName" jdbcType="VARCHAR" property="endpointName" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        endpointId as "endpointId", ip, endpointName as "endpointName"
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_endpoint_info
+        where ip = #{ip,jdbcType=VARCHAR}
+    </select>
+
+    <sql id="column">
+        id,
+        createTime as "createTime",
+        createUser as "createUser",
+        modifyTime as "modifyTime",
+        modifyUser as "modifyUser",
+        sysParamKey as "sysParamKey",
+        paramType as "paramType",
+        propKey as "propKey",
+        propName as "propName",
+        propValue as "propValue",
+        propValidExpr as "propValidExpr",
+        propValue as "propValue",
+        propTips as "propTips",
+        isPassword as "isPassword",
+        isShow as "isShow",
+        isRequiredField as "isRequiredField",
+        isEdit as "isEdit",
+        paramDesc as "paramDesc",
+        componentType as "componentType",
+        optionalValues as "optionalValues"
+    </sql>
+
+    <select id="getAllInfo" resultType="com.rtm.application.mybatisFlex.demo.entity.SystemParamConfigEntity">
+        select
+            <include refid="column"/>
+        from t_sys_param_config
+        WHERE createTime  BETWEEN (sysdate - interval(#{timeLength}) second to second ) AND sysdate
+    </select>
+
+</mapper>

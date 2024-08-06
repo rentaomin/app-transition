@@ -34,6 +34,7 @@
         <result column="isremoved" jdbcType="INTEGER" property="isRemoved"/>
     </resultMap>
 
+
     <delete id="deleteExpireInfoByDate" parameterType="java.lang.String">
         delete from t_service_status_info where modifyTime &lt;= #{expireTime}
     </delete>

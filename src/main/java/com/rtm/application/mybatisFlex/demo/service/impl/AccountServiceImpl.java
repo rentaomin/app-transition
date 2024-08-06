@@ -7,6 +7,7 @@ import com.rtm.application.mybatisFlex.demo.entity.Account;
 import com.rtm.application.mybatisFlex.demo.mapper.AccountMapper;
 import com.rtm.application.mybatisFlex.demo.service.AccountService;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.List;
 
