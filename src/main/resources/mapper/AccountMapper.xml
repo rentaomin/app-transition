@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rtm.application.mybatisFlex.demo.mapper.AccountMapper">
+
+    <insert id="insertAccount" parameterType="java.util.HashMap">
+      INSERT INTO tb_account(user_name,age,birthday,info) values ('aa',22,'2024-08-08 11:54:21',#{info});
+    </insert>
+
+    <insert id="insertTestBolb" parameterType="java.util.HashMap">
+        INSERT INTO test(info) values (#{info});
+    </insert>
+
+
+    <insert id="insertTestByte" parameterType="java.util.HashMap">
+        INSERT INTO test(info) values (#{info,jdbcType=BLOB});
+    </insert>
+
+</mapper>

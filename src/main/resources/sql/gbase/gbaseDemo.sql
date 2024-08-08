@@ -1,6 +1,6 @@
 -- 日期类型数据测试
 CREATE TABLE tb_account(
-    id      INTEGER PRIMARY key ,
+    id      serial PRIMARY key ,
     user_name VARCHAR(100),
     age      INTEGER,
     birthday  datetime year to second

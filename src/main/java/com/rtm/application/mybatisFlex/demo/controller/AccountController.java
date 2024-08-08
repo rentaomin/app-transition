@@ -48,7 +48,12 @@ public class AccountController {
         account.setAge(22);
         account.setUserName("ff");
         account.setBirthday(new Date());
-        int insert = accountService.insert(account);
+        int insert = 0;
+        try {
+            insert = accountService.insert(account);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return insert;
     }
 }
