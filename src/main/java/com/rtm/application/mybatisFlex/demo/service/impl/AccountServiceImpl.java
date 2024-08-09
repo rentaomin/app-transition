@@ -4,7 +4,9 @@ import com.mybatisflex.core.datasource.DataSourceKey;
 import com.mybatisflex.core.datasource.FlexDataSource;
 import com.rtm.application.mybatisFlex.component.dbinit.DataSourceProperties;
 import com.rtm.application.mybatisFlex.demo.entity.Account;
+import com.rtm.application.mybatisFlex.demo.entity.IdDemo;
 import com.rtm.application.mybatisFlex.demo.mapper.AccountMapper;
+import com.rtm.application.mybatisFlex.demo.mapper.IdMapper;
 import com.rtm.application.mybatisFlex.demo.service.AccountService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,7 +74,26 @@ public class AccountServiceImpl implements AccountService {
 
 //        int a = 1/ 0;
 
-        insertByte(account);
+//        insertByte(account);
+        insertAccountSerial(account);
+        return 0;
+    }
+
+    @Resource
+    private IdMapper idMapper;
+    public int insertAccountSerial(Account account) {
+
+        Map<String, Object> params = new HashMap<>();
+        try {
+            params.put("info", "aaaa");
+            IdDemo idDemo = new IdDemo();
+//            idDemo.setId(100L);
+            idDemo.setName("bbb");
+            idMapper.insert(idDemo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+//        int a = 1/ 0;
         return 0;
     }
 

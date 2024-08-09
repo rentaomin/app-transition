@@ -16,4 +16,8 @@
         INSERT INTO test(info) values (#{info,jdbcType=BLOB});
     </insert>
 
+    <insert id="insertAccountSerial" parameterType="java.util.HashMap">
+        INSERT INTO sss_aa(name ) values (#{info});
+    </insert>
+
 </mapper>

@@ -17,4 +17,6 @@ public interface AccountMapper extends BaseMapper<Account> {
     int insertTestBolb(Map<String,Blob> params);
 
     int insertTestByte(Map<String,Object> params);
+
+    int insertAccountSerial(Map<String,Object> params);
 }

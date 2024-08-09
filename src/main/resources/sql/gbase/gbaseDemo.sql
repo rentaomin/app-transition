@@ -8,6 +8,12 @@ CREATE TABLE tb_account(
 
 INSERT INTO tb_account(id, user_name, age, birthday) VALUES (1, '张三', 18, '2020-01-11 14:01:32'),(2, '李四', 19, '2021-03-21  12:02:01');
 
+CREATE TABLE id_demo (
+                         id serial,
+                         name varchar(100)
+);
+
+
 -- 创建表
 create table tab_dt
 (
