@@ -28,6 +28,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+/**
+ *  生成java实体类入口： 启动参数 -l  java D:\xx\zookeeper.jute
+ */
+
 @SuppressWarnings("unused")
 public class Rcc implements RccConstants {
     private static Hashtable<String, JRecord> recTab = new Hashtable<String, JRecord>();
