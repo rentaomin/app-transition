@@ -161,6 +161,20 @@
       <version>${pagehelper.version}</version>
     </dependency>
 
+
+      <!-- 协议包解析工具 -->
+    <dependency>
+      <groupId>org.pcap4j</groupId>
+      <artifactId>pcap4j-core</artifactId>
+      <version>1.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.pcap4j</groupId>
+      <artifactId>pcap4j-packetfactory-static</artifactId>
+      <version>1.8.2</version>
+    </dependency>
+
+
   </dependencies>
   <build>
     <plugins>
