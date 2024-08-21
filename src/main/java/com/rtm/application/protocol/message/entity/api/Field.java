@@ -41,10 +41,15 @@ public class Field {
         if (this == null) {
             return false;
         }
-        if (this.key == null || target.key == null || this.value == null || target.value == null) {
+        // 暂时忽略 value
+        if (this.key == null || target.key == null) {
             return false;
         }
-        return  (this.key.equals(target.key) && this.value.equals(target.value));
+//        if (this.key == null || target.key == null || this.value == null || target.value == null) {
+//            return false;
+//        }
+//        return  (this.key.equals(target.key) && this.value.equals(target.value));
+        return  (this.key.equals(target.key));
     }
 
 

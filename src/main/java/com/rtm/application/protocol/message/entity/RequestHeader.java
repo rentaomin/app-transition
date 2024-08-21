@@ -165,52 +165,15 @@ public class RequestHeader {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("当前请求数据包总长度 length：");
-        stringBuilder.append("[");
-        stringBuilder.append(this.length);
-        stringBuilder.append("]");
-        stringBuilder.append(",");
-
-        stringBuilder.append("当前请求数据包 apiKey：");
-        stringBuilder.append("[");
-        stringBuilder.append(this.apiKey);
-        stringBuilder.append("]");
-        stringBuilder.append(",");
-
-        stringBuilder.append("当前请求数据包 apiVersion：");
-        stringBuilder.append("[");
-        stringBuilder.append(this.apiVersion);
-        stringBuilder.append("]");
-        stringBuilder.append(",");
-
-        stringBuilder.append("当前请求数据包 clientId：");
-        stringBuilder.append("[");
-        stringBuilder.append(this.clientId);
-        stringBuilder.append("]");
-        stringBuilder.append(",");
-
-        stringBuilder.append("当前请求数据包 correlationId：");
-        stringBuilder.append("[");
-        stringBuilder.append(this.correlationId);
-        stringBuilder.append("]");
-        stringBuilder.append(",");
-
-        stringBuilder.append("当前请求数据包 headerLength：");
-        stringBuilder.append("[");
-        stringBuilder.append(this.headerLength);
-        stringBuilder.append("]");
-        stringBuilder.append(",");
-
-
-        stringBuilder.append("当前请求数据包 taggedFields：");
-        for (Field field: this.taggedFields) {
-            stringBuilder.append("{");
-            stringBuilder.append(field.toString());
-            stringBuilder.append("}");
-            stringBuilder.append(",");
-        }
-
-        return stringBuilder.toString();
+        return "RequestHeader{" +
+                "length=" + length +
+                ", apiKey=" + apiKey +
+                ", apiVersion=" + apiVersion +
+                ", correlationId=" + correlationId +
+                ", clientId='" + clientId + '\'' +
+                ", taggedFields=" + taggedFields +
+                ", apiVersionKey=" + apiVersionKey +
+                ", headerLength=" + headerLength +
+                '}';
     }
 }

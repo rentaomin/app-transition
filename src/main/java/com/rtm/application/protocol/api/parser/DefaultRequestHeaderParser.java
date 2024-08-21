@@ -2,11 +2,11 @@ package com.rtm.application.protocol.api.parser;
 
 import com.rtm.application.protocol.KafkaProtocolParser;
 import com.rtm.application.protocol.message.entity.RequestHeader;
-import com.rtm.application.protocol.message.enums.ApiKeysCode;
+import com.rtm.application.protocol.message.enums.ApiKeys;
 import com.rtm.application.protocol.message.enums.ApiVersion;
 import com.rtm.application.protocol.message.exception.RequestProtocolParseException;
 import com.rtm.application.protocol.message.exception.UnSupportApiKeyParseException;
-import com.rtm.application.protocol.util.ByteBufferReader;
+import com.rtm.application.protocol.util.ByteUtils;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,16 +48,10 @@ public class DefaultRequestHeaderParser implements KafkaProtocolParser<RequestHe
         int payloadLength = 4;
         int readLength = 0 + payloadLength;
 
-        System.out.println("捕获到 Kafka 数据包: ");
-        System.out.println("数据包长度: " + payloadDataLength);
-        // 解析更多的 Kafka 协议数据（例如查询内容、响应内容等）
-
         short apiKey = buffer.getShort();
-        System.out.println("apiKey: "+ apiKey);
         readLength += 2;
 
         short apiVersion = buffer.getShort();
-        System.out.println("apiVersion: "+ apiVersion);
         readLength += 2;
 
         if (!supportParse(apiVersion)) {
@@ -71,8 +65,7 @@ public class DefaultRequestHeaderParser implements KafkaProtocolParser<RequestHe
         short clientIdLength = buffer.getShort();
         readLength += 2;
 
-        String clientId = ByteBufferReader.getString(buffer,clientIdLength);
-        System.out.println("clientId: "+ clientId);
+        String clientId = ByteUtils.getString(buffer,clientIdLength);
         readLength += clientIdLength;
 
         RequestHeader requestHeader = new RequestHeader();
@@ -86,7 +79,7 @@ public class DefaultRequestHeaderParser implements KafkaProtocolParser<RequestHe
     }
 
     public boolean supportParse(short apiVersion) {
-        return ApiKeysCode.contains(apiVersion);
+        return ApiKeys.contains(apiVersion);
     }
 
     @Override
@@ -96,7 +89,7 @@ public class DefaultRequestHeaderParser implements KafkaProtocolParser<RequestHe
 
     @Override
     public short getApiKey() {
-        return ApiKeysCode.REQUEST_HEADER.getCode();
+        return ApiKeys.REQUEST_HEADER.getCode();
     }
 
     @Override

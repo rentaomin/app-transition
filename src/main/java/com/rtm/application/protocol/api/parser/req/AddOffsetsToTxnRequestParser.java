@@ -2,7 +2,7 @@ package com.rtm.application.protocol.api.parser.req;
 
 import com.rtm.application.protocol.KafkaProtocolParser;
 import com.rtm.application.protocol.message.entity.api.req.AddOffsetsToTxnRequestBody;
-import com.rtm.application.protocol.message.enums.ApiKeysCode;
+import com.rtm.application.protocol.message.enums.ApiKeys;
 import com.rtm.application.protocol.message.exception.ProtocolParseException;
 import java.nio.ByteBuffer;
 
@@ -26,7 +26,7 @@ public class AddOffsetsToTxnRequestParser implements KafkaProtocolParser<AddOffs
 
     @Override
     public short getApiKey() {
-        return ApiKeysCode.AddOffsetsToTxn.getCode();
+        return ApiKeys.AddOffsetsToTxn.getCode();
     }
 
     @Override

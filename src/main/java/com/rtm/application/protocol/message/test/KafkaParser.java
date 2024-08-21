@@ -96,7 +96,6 @@ public class KafkaParser {
 
             ProtocolMessage message = new ProtocolMessage(srcIp,srcPort,destIp,destPort,payload);
             kafkaProtocolParserManager.parse(message);
-
         }
     }
 

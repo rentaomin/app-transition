@@ -36,4 +36,13 @@ public class RequestMessage {
     public void setParseComplete(boolean parseComplete) {
         this.parseComplete = parseComplete;
     }
+
+    @Override
+    public String toString() {
+        return "RequestMessage{" +
+                "header=" + header +
+                ", payload=" + payload +
+                ", parseComplete=" + parseComplete +
+                '}';
+    }
 }

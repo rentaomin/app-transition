@@ -10,15 +10,17 @@ import com.rtm.application.protocol.message.entity.api.Field;
 import com.rtm.application.protocol.message.exception.NotFoundProtocolParseException;
 import com.rtm.application.protocol.message.exception.ProtocolParseException;
 import com.rtm.application.protocol.message.exception.RequestProtocolParseException;
-import com.rtm.application.protocol.message.exception.ResponseProtocolParseException;
-import com.rtm.application.protocol.util.ByteBufferReader;
+import com.rtm.application.protocol.util.ByteUtils;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- *  对外提供解析入口
+ * @description:  对外提供解析入口
+ * @author rtm
+ * @date 2024/8/21
  */
 public class KafkaProtocolParserManager implements ProtocolParser<Message> {
 
@@ -39,53 +41,43 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
      */
     private final Map<String,ByteBuffer> segmentPacket = new ConcurrentHashMap<>();
 
+    /**
+     *  存储数据包信息，用于解析对应的请求包内容
+     */
+    private AtomicReference<ProtocolMessage> packetMessage = new AtomicReference<>();
+
+
     @Override
     public Message parse(ProtocolMessage data) throws ProtocolParseException {
+
+        init(data);
 
         if (!supportParse(data)) {
             throw new ProtocolParseException("非 Kafka 协议包，跳过解析！");
         }
+        String segmentKey = getSegmentKey(data);
+        ByteBuffer preSegmentPacket = segmentPacket.get(segmentKey);
+        ByteBuffer combinedPacket = ByteUtils.combineBuffers(preSegmentPacket, ByteUtils.wrap(data.getRawData()));
+
         Message message = null;
-        if (isCompletePacket(data)) {
-            message = startParse(data);
+        if (transmitFinished(combinedPacket)) {
+
+            clearSegmentPacket();
+
+            message = startParse(combinedPacket);
+        } else {
+            segmentPacket.put(segmentKey, combinedPacket);
         }
         return message;
     }
 
 
-
     /**
-     *  判断当前包是否是完整的数据包,
-     *
-     *  <p>
-     *      1、判断当前包是否是完整的包，请求头长度等于总包长度，则返回 true
-     *  </p>
-     *  <p>
-     *      2、若为分片传输，则查询缓存分片数据包，拼接后再判断是否包已经传输完成进行合并，整包传输完成则返回 true，
-     *      反之则更新缓存，等待完整包上传输。
-     *  </p>
-     * @param data 捕获的数据包
-     * @return 返回 true 则是完整的数据包，返回 false 则不是完整的数据包
+     *  解析初始化
+     * @param data
      */
-    private boolean isCompletePacket(ProtocolMessage data) {
-        ByteBuffer byteBuffer = ByteBufferReader.wrap(data.getRawData());
-
-        if (transmitFinished(byteBuffer)) {
-            return true;
-        }
-
-        String segmentKey = getSegmentKey(data);
-
-        ByteBuffer cachedSegmentPacket = segmentPacket.get(segmentKey);
-        ByteBuffer combinedBuffer = ByteBufferReader.combineBuffers(cachedSegmentPacket, byteBuffer);
-
-        if (transmitFinished(combinedBuffer)) {
-            segmentPacket.remove(segmentKey);
-            return true;
-        } else {
-            segmentPacket.put(segmentKey,combinedBuffer);
-            return false;
-        }
+    public void init(ProtocolMessage data) {
+        packetMessage.set(data);
     }
 
 
@@ -93,23 +85,30 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
         return data.getSrcIp() + ":" + data.getSrcPort() + "=>" + data.getDestIp() + ":" + data.getDstPort();
     }
 
+    /**
+     * 清除分片数据包
+     */
+    private void clearSegmentPacket() {
+        String segmentKey = getSegmentKey(packetMessage.get());
+        segmentPacket.remove(segmentKey);
+    }
+
 
     /**
      * 是否开始解析数据包
-     * @param data 解析后的请求头数据
+     * @param byteBuffer 抓取的数据包内容
      * @return 返回 true 则开始解析，返回 false 则不进行解析
      */
-    public Message startParse(ProtocolMessage data) throws ProtocolParseException {
+    public Message startParse(ByteBuffer byteBuffer) throws ProtocolParseException {
 
         RequestMessage requestMessage = null;
         ResponseMessage responseMessage = null;
 
-        int messageSize = data.getRawData().length;
+        int messageSize = byteBuffer.remaining();
 
-        ByteBuffer byteBuffer = ByteBufferReader.wrap(data.getRawData());
-        if (isRequestPacket(data)) {
+        if (isRequestPacket(packetMessage.get())) {
             requestMessage = parseRequestPacket(byteBuffer);
-        } else if (isResponsePacket(data)) {
+        } else if (isResponsePacket(packetMessage.get())) {
             responseMessage = parseResponsePacket(byteBuffer);
         } else {
             throw new ProtocolParseException("无法识别的数据包类型!");
@@ -138,8 +137,9 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
         if (requestHeader == null) {
             throw new RequestProtocolParseException("请求头协议解析内容为空!");
         }
+        System.out.println("请求头解析完成，coleretionId："+requestHeader.getCorrelationId());
 
-        ByteBuffer remainingPayload = ByteBufferReader.getRemainingByteBuffer(payload);
+        ByteBuffer remainingPayload = ByteUtils.getRemainingByteBuffer(payload);
 
         RequestBody requestBody = null;
         if (containsPayload(requestHeader.getHeaderLength(),requestHeader.getLength())) {
@@ -154,11 +154,6 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
         messages.put(requestHeader.getCorrelationId(), requestMessage);
 
         return requestMessage;
-    }
-
-
-    public boolean isSegmentPacket(ByteBuffer cachedSegmentPacket) {
-      return cachedSegmentPacket != null && cachedSegmentPacket.remaining() > 0;
     }
 
 
@@ -179,8 +174,7 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
 
         int remainingLength = payload.remaining();
 
-        System.out.println("总包长度："+totalPacketLength);
-        System.out.println("当前包长度： "+remainingLength);
+        System.out.println("总包长度："+totalPacketLength + "<===当前包长度：===> "+remainingLength);
         return totalPacketLength !=0 && remainingLength >= totalPacketLength;
     }
 
@@ -198,6 +192,10 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
 
     public RequestBody parseRequestPayload(Field apiVersionKey, ByteBuffer payload) throws ProtocolParseException {
         KafkaProtocolParser<RequestBody> requestBodyParser = KafkaParserFactory.getRequestParser(apiVersionKey);
+        if (requestBodyParser == null) {
+            System.out.println("未找到跳过！");
+            return null;
+        }
         return requestBodyParser.parsePacket(payload);
     }
 
@@ -213,11 +211,13 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
             throw new RequestProtocolParseException("响应数据包请求头协议解析内容为空!");
         }
 
-        ByteBuffer remainingPayload = ByteBufferReader.getRemainingByteBuffer(byteBuffer);
+        ByteBuffer remainingPayload = ByteUtils.getRemainingByteBuffer(byteBuffer);
 
         ResponseBody responseBody = null;
         if (containsPayload(responseHeader.getHeaderLength(), responseHeader.getLength())) {
             responseBody = parseResponsePayload(responseHeader.getCorrelationId(), remainingPayload);
+        } else {
+            System.out.println("响应 id : "+responseHeader.getCorrelationId());
         }
 
         ResponseMessage responseMessage = new ResponseMessage();
@@ -231,12 +231,29 @@ public class KafkaProtocolParserManager implements ProtocolParser<Message> {
 
     public ResponseBody parseResponsePayload(int correlationId, ByteBuffer payload) throws ProtocolParseException {
         RequestMessage requestMessage = messages.get(correlationId);
-
         if (requestMessage == null) {
-            throw new ResponseProtocolParseException("未找到响应数据包对应的请求数据包消息，" +
-                    "CorrelationId: " + correlationId);
+            String msg = "未找到响应数据包对应的请求数据包消息，" +
+                    "CorrelationId: " + correlationId;
+            System.out.println(msg);
+            return null;
         }
-        return KafkaParserFactory.getResponseParser(requestMessage.getHeader().getApiVersionKey()).parsePacket(payload);
+
+        RequestHeader responseHeader = requestMessage.getHeader();
+        if (responseHeader == null) {
+//            throw new ResponseProtocolParseException("未找到响应数据包对应的请求数据包消息，" +
+//                    "CorrelationId: " + correlationId +
+//                    "apiKey: " + ApiKeys.getApiDescription(responseHeader.getApiKey()) +
+//                    "apiVersion: " + responseHeader.getApiVersion()
+//                    );
+            return null;
+        }
+        messages.remove(correlationId);
+        KafkaProtocolParser<ResponseBody> responseParser = KafkaParserFactory.getResponseParser(responseHeader.getApiVersionKey());
+        if (responseParser == null) {
+            System.out.println("未找到跳过！");
+            return null;
+        }
+        return responseParser.parsePacket(payload);
     }
 
 

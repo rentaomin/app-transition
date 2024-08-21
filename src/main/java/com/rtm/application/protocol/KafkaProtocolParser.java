@@ -1,7 +1,7 @@
 package com.rtm.application.protocol;
 
 import com.rtm.application.protocol.message.entity.api.Field;
-import com.rtm.application.protocol.message.enums.ApiKeysCode;
+import com.rtm.application.protocol.message.enums.ApiKeys;
 import com.rtm.application.protocol.message.enums.ApiVersion;
 import com.rtm.application.protocol.message.exception.ProtocolParseException;
 import com.rtm.application.protocol.message.exception.RequestProtocolParseException;
@@ -36,7 +36,7 @@ public interface KafkaProtocolParser<K> {
     short getVersion();
 
     /**
-     *  获取解析器支持的 apiKey,@see {@link ApiKeysCode#getCode()}
+     *  获取解析器支持的 apiKey,@see {@link ApiKeys#getCode()}
      * @return 返回 apiKey 标识
      */
     short getApiKey();
@@ -54,7 +54,6 @@ public interface KafkaProtocolParser<K> {
      */
     default int getPacketLength(ByteBuffer payload) {
         int payloadDataLength = payload.getInt();
-        System.out.println(payloadDataLength);
         return payloadDataLength;
     }
 

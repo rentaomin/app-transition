@@ -2,7 +2,7 @@ package com.rtm.application.protocol.api.parser;
 
 import com.rtm.application.protocol.KafkaProtocolParser;
 import com.rtm.application.protocol.message.entity.ResponseHeader;
-import com.rtm.application.protocol.message.enums.ApiKeysCode;
+import com.rtm.application.protocol.message.enums.ApiKeys;
 import com.rtm.application.protocol.message.enums.ApiVersion;
 import com.rtm.application.protocol.message.exception.ProtocolParseException;
 import java.nio.ByteBuffer;
@@ -23,6 +23,7 @@ public class DefaultResponseHeaderParser implements KafkaProtocolParser<Response
             responseHeader.setLength(payload.getInt());
             responseHeader.setCorrelationId(payload.getInt());
             responseHeader.setHeaderLength(4 + 4);
+            System.out.println("响应correlationId: "+responseHeader.getCorrelationId());
         } catch (Exception e) {
             throw new ProtocolParseException("响应头协议解析异常！", e);
         }
@@ -36,7 +37,7 @@ public class DefaultResponseHeaderParser implements KafkaProtocolParser<Response
 
     @Override
     public short getApiKey() {
-        return ApiKeysCode.RESPONSE_HEADER.getCode();
+        return ApiKeys.RESPONSE_HEADER.getCode();
     }
 
     @Override

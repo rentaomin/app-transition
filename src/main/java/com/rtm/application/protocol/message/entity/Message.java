@@ -54,4 +54,14 @@ public class Message {
     public void setParseComplete(boolean parseComplete) {
         this.parseComplete = parseComplete;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "messageSize=" + messageSize +
+                ", requestMessage=" + requestMessage +
+                ", responseMessage=" + responseMessage +
+                ", parseComplete=" + parseComplete +
+                '}';
+    }
 }

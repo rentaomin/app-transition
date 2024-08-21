@@ -72,4 +72,14 @@ public class ResponseHeader {
     public void setHeaderLength(int headerLength) {
         this.headerLength = headerLength;
     }
+
+    @Override
+    public String toString() {
+        return "ResponseHeader{" +
+                "length=" + length +
+                ", correlationId=" + correlationId +
+                ", taggedFields=" + taggedFields +
+                ", headerLength=" + headerLength +
+                '}';
+    }
 }

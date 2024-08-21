@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
  * 以下是请求中的 ApiKey 对于以下每种请求类型可以采用的数字代码。
  *  与官方文档一致：https://kafka.apache.org/protocol#protocol_details
  */
-public enum ApiKeysCode {
+public enum ApiKeys {
 
     REQUEST_HEADER((short)200,"RequestHeader"),
     RESPONSE_HEADER((short)300,"ResponseHeader"),
@@ -92,11 +92,11 @@ public enum ApiKeysCode {
     /**
      *  支持的 api key 映射表
      */
-    private static final Map<Short, String> apiKeyCodeMap = Arrays.stream(ApiKeysCode.values())
-            .collect(Collectors.toMap(ApiKeysCode::getCode, ApiKeysCode::getName));
+    private static final Map<Short, String> apiKeyCodeMap = Arrays.stream(ApiKeys.values())
+            .collect(Collectors.toMap(ApiKeys::getCode, ApiKeys::getName));
 
 
-    ApiKeysCode(short code, String name) {
+    ApiKeys(short code, String name) {
         this.code = code;
         this.name = name;
     }
@@ -114,7 +114,7 @@ public enum ApiKeysCode {
     }
 
 
-    public String getApiDescription(short apiKeyCode) {
+    public static String getApiDescription(short apiKeyCode) {
         StringBuffer stringBuffer = new StringBuffer();
         return stringBuffer.append(getName(apiKeyCode))
                 .append(" ( ")
