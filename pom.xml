@@ -175,12 +175,19 @@
     </dependency>
 
       <!-- KafkaParser Java Client -->
-      <dependency>
-        <groupId>org.apache.kafka</groupId>
-        <artifactId>kafka-clients</artifactId>
-<!--        <version>3.5.1</version> &lt;!&ndash; 使用Kafka的最新稳定版本 &ndash;&gt;-->
-        <version>3.8.0</version>
-      </dependency>
+<!--      <dependency>-->
+<!--        <groupId>org.apache.kafka</groupId>-->
+<!--        <artifactId>kafka-clients</artifactId>-->
+<!--        <version>3.8.0</version>-->
+<!--      </dependency>-->
+
+    <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>3.4.1</version>
+    </dependency>
+
 
   </dependencies>
   <build>

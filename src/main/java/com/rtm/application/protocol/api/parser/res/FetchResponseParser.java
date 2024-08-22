@@ -43,7 +43,7 @@ public class FetchResponseParser implements KafkaProtocolParser<FetchResponseBod
 
 
     @Override
-    public FetchResponseBody parsePacket(ByteBuffer payload) throws ProtocolParseException {
+    public FetchResponseBody parsePacket(ByteBuffer payload, short version) throws ProtocolParseException {
         FetchResponseBody fetchResponseBody = new FetchResponseBody();
         fetchResponseBody.setThrottleTimeMs(payload.getInt());
         fetchResponseBody.setErrorCode(payload.getShort());
@@ -192,9 +192,15 @@ public class FetchResponseParser implements KafkaProtocolParser<FetchResponseBod
 
 
     @Override
-    public short getVersion() {
+    public short getMinVersion() {
         return ApiVersion.V16.getVersion();
     }
+
+    @Override
+    public short getMaxVersion() {
+        return ApiVersion.V16.getVersion();
+    }
+
 
     @Override
     public short getApiKey() {

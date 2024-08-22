@@ -46,6 +46,8 @@ public class MetadataResponseBody extends ResponseBody {
 
     private List<MetadataTopic> topics;
 
+    private int topicAuthorizedOperations;
+
     public int getThrottleTimeMs() {
         return throttleTimeMs;
     }
@@ -102,6 +104,15 @@ public class MetadataResponseBody extends ResponseBody {
         this.topics = topics;
     }
 
+
+    public int getTopicAuthorizedOperations() {
+        return topicAuthorizedOperations;
+    }
+
+    public void setTopicAuthorizedOperations(int topicAuthorizedOperations) {
+        this.topicAuthorizedOperations = topicAuthorizedOperations;
+    }
+
     @Override
     public String toString() {
         return "MetadataResponseBody{" +
@@ -112,6 +123,7 @@ public class MetadataResponseBody extends ResponseBody {
                 ", controllerId=" + controllerId +
                 ", topicSize=" + topicSize +
                 ", topics=" + topics +
+                ", topicAuthorizedOperations=" + topicAuthorizedOperations +
                 '}';
     }
 

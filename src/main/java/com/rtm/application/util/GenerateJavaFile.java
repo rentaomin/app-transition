@@ -1,6 +1,7 @@
 package com.rtm.application.util;
 
 import java.io.*;
+import java.util.StringJoiner;
 
 public class GenerateJavaFile {
 
@@ -91,6 +92,7 @@ public class GenerateJavaFile {
                 className = className.trim();
                 if (!className.isEmpty()) {
                     // 为每个类名生成实体类文件
+
                     StringBuilder req = new StringBuilder();
                     req.append("package com.rtm.application.protocol.api.parser.req;");
                     req.append("\n\n");

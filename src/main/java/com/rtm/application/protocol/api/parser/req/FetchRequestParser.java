@@ -42,7 +42,7 @@ public class FetchRequestParser implements KafkaProtocolParser<FetchRequestBody>
 
 
     @Override
-    public FetchRequestBody parsePacket(ByteBuffer payload) throws ProtocolParseException {
+    public FetchRequestBody parsePacket(ByteBuffer payload, short version) throws ProtocolParseException {
         if (payload.remaining() <= 0) {
             return null;
         }
@@ -65,7 +65,7 @@ public class FetchRequestParser implements KafkaProtocolParser<FetchRequestBody>
         fetchRequestBody.setForgottenTopicsDataSize(forgottenTopicSize);
 
         fetchRequestBody.setForgottenTopicsData(this.parseTopic(payload, forgottenTopicSize));
-        System.out.println("解析完成"+fetchRequestBody.toString());
+        System.out.println("解析完成"+fetchRequestBody);
         return fetchRequestBody;
     }
 
@@ -104,9 +104,16 @@ public class FetchRequestParser implements KafkaProtocolParser<FetchRequestBody>
 
 
     @Override
-    public short getVersion() {
+    public short getMinVersion() {
         return ApiVersion.V16.getVersion();
     }
+
+
+    @Override
+    public short getMaxVersion() {
+        return ApiVersion.V16.getVersion();
+    }
+
 
     @Override
     public short getApiKey() {

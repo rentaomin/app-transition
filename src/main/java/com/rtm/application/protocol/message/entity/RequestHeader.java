@@ -1,5 +1,6 @@
 package com.rtm.application.protocol.message.entity;
 
+import com.rtm.application.protocol.message.entity.api.ApiVersionInfo;
 import com.rtm.application.protocol.message.entity.api.Field;
 
 import java.util.List;
@@ -60,7 +61,10 @@ public class RequestHeader {
      */
     private List<Field> taggedFields;
 
-    private Field apiVersionKey;
+    /**
+     *  Api 版本信息
+     */
+    private ApiVersionInfo apiVersionInfo;
 
     /**
      *  请求头的长度
@@ -115,17 +119,16 @@ public class RequestHeader {
         this.taggedFields = taggedFields;
     }
 
-    public Field getApiVersionKey() {
-        if (apiVersionKey == null) {
-            apiVersionKey = new Field(String.valueOf(apiKey), String.valueOf(apiVersion));
+    public ApiVersionInfo getApiVersionInfo() {
+        if (apiVersionInfo == null) {
+            apiVersionInfo = new ApiVersionInfo(apiKey, apiVersion);
         }
-        return apiVersionKey;
+        return apiVersionInfo;
     }
 
-    public void setApiVersionKey(Field apiVersionKey) {
-        this.apiVersionKey = apiVersionKey;
+    public void setApiVersionInfo(ApiVersionInfo apiVersionInfo) {
+        this.apiVersionInfo = apiVersionInfo;
     }
-
 
     public int getHeaderLength() {
         return headerLength;
@@ -172,7 +175,7 @@ public class RequestHeader {
                 ", correlationId=" + correlationId +
                 ", clientId='" + clientId + '\'' +
                 ", taggedFields=" + taggedFields +
-                ", apiVersionKey=" + apiVersionKey +
+                ", apiVersionInfo=" + apiVersionInfo +
                 ", headerLength=" + headerLength +
                 '}';
     }

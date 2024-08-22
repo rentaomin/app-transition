@@ -1,5 +1,6 @@
 package com.rtm.application.protocol.message.entity;
 
+import com.rtm.application.protocol.message.entity.api.ApiVersionInfo;
 import com.rtm.application.protocol.message.entity.api.Field;
 import java.util.List;
 
@@ -39,6 +40,8 @@ public class ResponseHeader {
      */
     private int headerLength;
 
+    private ApiVersionInfo apiVersionInfo;
+
 
     public int getLength() {
         return length;
@@ -71,6 +74,15 @@ public class ResponseHeader {
 
     public void setHeaderLength(int headerLength) {
         this.headerLength = headerLength;
+    }
+
+
+    public ApiVersionInfo getApiVersionInfo() {
+        return apiVersionInfo;
+    }
+
+    public void setApiVersionInfo(ApiVersionInfo apiVersionInfo) {
+        this.apiVersionInfo = apiVersionInfo;
     }
 
     @Override

@@ -14,11 +14,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
+ *
+ * Request Header v2 => request_api_key request_api_version correlation_id client_id TAG_BUFFER
+ *   request_api_key => INT16
+ *   request_api_version => INT16
+ *   correlation_id => INT32
+ *   client_id => NULLABLE_STRING
  * 请求头解析器
  * @author rtm
  * @date 2023/08/08
  */
-public class DefaultRequestHeaderParser implements KafkaProtocolParser<RequestHeader> {
+public class RequestHeaderParser implements KafkaProtocolParser<RequestHeader> {
 
 
     /**
@@ -32,60 +38,65 @@ public class DefaultRequestHeaderParser implements KafkaProtocolParser<RequestHe
     private Map<Integer,?> correlationIds = new ConcurrentHashMap<>();
 
     @Override
-    public RequestHeader parsePacket(ByteBuffer payload) throws RequestProtocolParseException, UnSupportApiKeyParseException {
-        return parseHeader(payload, getPacketLength(payload));
+    public RequestHeader parsePacket(ByteBuffer payload, short version) throws RequestProtocolParseException, UnSupportApiKeyParseException {
+        if (!supportParse(getApiKey(), version)) {
+            throw new UnSupportApiKeyParseException("暂时不支持  ："+version+"{} Api key 解析！");
+        }
+        return parseHeader(payload, version);
     }
 
 
     /**
      * 解析请求头数据包
      * @param buffer 数据包
-     * @param payloadDataLength 数据包长度
+     * @param version   版本号
      * @return 返回解析后的请求头数据内容
      * @throws UnSupportApiKeyParseException 不支持的 ApiKey 解析异常
      */
-    private RequestHeader parseHeader(ByteBuffer buffer, int payloadDataLength) throws UnSupportApiKeyParseException {
+    private RequestHeader parseHeader(ByteBuffer buffer, short version) throws UnSupportApiKeyParseException {
+        RequestHeader requestHeader = new RequestHeader();
+
         int payloadLength = 4;
         int readLength = 0 + payloadLength;
+        requestHeader.setLength(getPacketLength(buffer));
 
         short apiKey = buffer.getShort();
         readLength += 2;
+        requestHeader.setApiKey(apiKey);
 
         short apiVersion = buffer.getShort();
         readLength += 2;
-
-        if (!supportParse(apiVersion)) {
-            throw new UnSupportApiKeyParseException("暂时不支持 ："+apiVersion+"{} Api key 解析！");
-        }
+        requestHeader.setApiVersion(apiVersion);
 
         int correlationId = buffer.getInt();
         System.out.println("correlationId: "+ correlationId);
         readLength += 4;
-
-        short clientIdLength = buffer.getShort();
-        readLength += 2;
-
-        String clientId = ByteUtils.getString(buffer,clientIdLength);
-        readLength += clientIdLength;
-
-        RequestHeader requestHeader = new RequestHeader();
-        requestHeader.setLength(payloadDataLength);
-        requestHeader.setApiKey(apiKey);
-        requestHeader.setApiVersion(apiVersion);
         requestHeader.setCorrelationId(correlationId);
-        requestHeader.setClientId(clientId);
+
+        if (version > getMinVersion() && version <= getMaxVersion()) {
+            short clientIdLength = buffer.getShort();
+            readLength += 2;
+            if (clientIdLength > 0) {
+                String clientId = ByteUtils.getString(buffer,clientIdLength);
+                readLength += clientIdLength;
+                requestHeader.setClientId(clientId);
+            }
+        }
         requestHeader.setHeaderLength(readLength);
         return requestHeader;
     }
 
-    public boolean supportParse(short apiVersion) {
-        return ApiKeys.contains(apiVersion);
+
+    @Override
+    public short getMinVersion() {
+        return ApiVersion.V0.getVersion();
     }
 
     @Override
-    public short getVersion() {
+    public short getMaxVersion() {
         return ApiVersion.V2.getVersion();
     }
+
 
     @Override
     public short getApiKey() {

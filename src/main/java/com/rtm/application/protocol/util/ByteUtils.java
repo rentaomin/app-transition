@@ -32,6 +32,12 @@ import java.nio.charset.StandardCharsets;
  */
 public final class ByteUtils {
 
+    public static void main(String[] args) {
+        ByteBuffer buffer = ByteBuffer.wrap(new byte[0xa60a]);
+        int i = ByteUtils.readVarint(buffer);
+        System.out.println(i);
+    }
+
     public static final ByteBuffer EMPTY_BUF = ByteBuffer.wrap(new byte[0]);
 
     private ByteUtils() {}
